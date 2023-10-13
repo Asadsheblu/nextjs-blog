@@ -3,8 +3,7 @@ import '../styles/globals.css'
 import Head from 'next/head'
 import Navbar from './Navbar'
 import Footer from './Home/Footer'
-import { ArrowUp } from 'react-bootstrap-icons'
-import ScrollButton from './ScrollButton'
+
 
 
 
