@@ -104,7 +104,7 @@ body {
     position: relative;
     color: #fff;
     text-align: center;
-    background: url(../public/img/hero.jpg);
+    background:url('../public/img/hero.jpg');
     box-shadow: inset 0 0 0 2000px rgba(8, 8, 10, 0.625);
     background-repeat: no-repeat;
     background-size: cover;
