@@ -18,7 +18,6 @@ const Faq = () => {
               >
                 <i className="bi bi-question-circle fs-4 text-primary"></i>
                 <span className="fs-4 ps-2">
-                 
                   Non consectetur a erat nam at lectus urna duis?
                 </span>
               </button>
@@ -31,16 +30,12 @@ const Faq = () => {
             >
               <div className="accordion-body title-text fs-6">
                 <p className="fs-6">
-                  <strong>This is the first items accordion body.</strong> It
-                  is shown by default, until the collapse plugin adds the
-                  appropriate classNamees that we use to style each element.
-                  These classNamees control the overall appearance, as well as
-                  the showing and hiding via CSS transitions. You can modify any
-                  of this with custom CSS or overriding our default variables.
-                  It is also worth noting that just about any HTML can go within
-                  the
-                  <code>.accordion-body</code>, though the transition does limit
-                  overflow.
+                What is the best formatter in VS Code? VSCode Prettier is a
+                popular code formatter that helps developers format their code
+                automatically. In this blog post, we will take a closer look at
+                the VSCode Prettier plugin, its benefits, and how to use it.
+                We will also explore how Prettier improves TypeScript, CSS, and
+                HTML code by looking at some code samples.
                 </p>
               </div>
             </div>
@@ -57,7 +52,6 @@ const Faq = () => {
               >
                 <i className="bi bi-question-circle fs-4 text-primary"></i>
                 <span className="fs-4 ps-2">
-                 
                   Feugiat scelerisque varius morbi enim nunc?
                 </span>
               </button>
@@ -69,15 +63,12 @@ const Faq = () => {
               data-bs-parent="#accordionExample"
             >
               <div className="accordion-body">
-                <strong>This is the second items accordion body.</strong> It is
-                hidden by default, until the collapse plugin adds the
-                appropriate classNamees that we use to style each element. These
-                classNamees control the overall appearance, as well as the
-                showing and hiding via CSS transitions. You can modify any of
-                this with custom CSS or overriding our default variables. Its
-                also worth noting that just about any HTML can go within the
-                <code>.accordion-body</code>, though the transition does limit
-                overflow.
+              What is the best formatter in VS Code? VSCode Prettier is a
+                popular code formatter that helps developers format their code
+                automatically. In this blog post, we will take a closer look at
+                the VSCode Prettier plugin, its benefits, and how to use it.
+                We will also explore how Prettier improves TypeScript, CSS, and
+                HTML code by looking at some code samples.
               </div>
             </div>
           </div>
@@ -93,7 +84,6 @@ const Faq = () => {
               >
                 <i className="bi bi-question-circle fs-4 text-primary"></i>
                 <span className="fs-4 ps-2">
-                  
                   Dolor sit amet consectetur adipiscing elit?
                 </span>
               </button>
@@ -105,15 +95,12 @@ const Faq = () => {
               data-bs-parent="#accordionExample"
             >
               <div className="accordion-body">
-                <strong>This is the third item's accordion body.</strong> It is
-                hidden by default, until the collapse plugin adds the
-                appropriate classNamees that we use to style each element. These
-                classNamees control the overall appearance, as well as the
-                showing and hiding via CSS transitions. You can modify any of
-                this with custom CSS or overriding our default variables. Its
-                also worth noting that just about any HTML can go within the
-                <code>.accordion-body</code>, though the transition does limit
-                overflow.
+              What is the best formatter in VS Code? VSCode Prettier is a
+                popular code formatter that helps developers format their code
+                automatically. In this blog post, we will take a closer look at
+                the VSCode Prettier plugin, its benefits, and how to use it.
+                We will also explore how Prettier improves TypeScript, CSS, and
+                HTML code by looking at some code samples.
               </div>
             </div>
           </div>
@@ -129,7 +116,6 @@ const Faq = () => {
               >
                 <i className="bi bi-question-circle fs-4 text-primary"></i>
                 <span className="fs-4 ps-2">
-                 
                   Dolor sit amet consectetur adipiscing elit?
                 </span>
               </button>
@@ -141,15 +127,12 @@ const Faq = () => {
               data-bs-parent="#accordionExample"
             >
               <div className="accordion-body">
-                <strong>This is the third item's accordion body.</strong> It is
-                hidden by default, until the collapse plugin adds the
-                appropriate classNamees that we use to style each element. These
-                classNamees control the overall appearance, as well as the
-                showing and hiding via CSS transitions. You can modify any of
-                this with custom CSS or overriding our default variables. Its
-                also worth noting that just about any HTML can go within the
-                <code>.accordion-body</code>, though the transition does limit
-                overflow.
+                What is the best formatter in VS Code? VSCode Prettier is a
+                popular code formatter that helps developers format their code
+                automatically. In this blog post, we will take a closer look at
+                the VSCode Prettier plugin, its benefits, and how to use it.
+                We will also explore how Prettier improves TypeScript, CSS, and
+                HTML code by looking at some code samples.
               </div>
             </div>
           </div>
@@ -177,15 +160,12 @@ const Faq = () => {
               data-bs-parent="#accordionExample"
             >
               <div className="accordion-body">
-                <strong>This is the third item's accordion body.</strong> It is
-                hidden by default, until the collapse plugin adds the
-                appropriate classNamees that we use to style each element. These
-                classNamees control the overall appearance, as well as the
-                showing and hiding via CSS transitions. You can modify any of
-                this with custom CSS or overriding our default variables. Its
-                also worth noting that just about any HTML can go within the
-                <code>.accordion-body</code>, though the transition does limit
-                overflow.
+              What is the best formatter in VS Code? VSCode Prettier is a
+                popular code formatter that helps developers format their code
+                automatically. In this blog post, we will take a closer look at
+                the VSCode Prettier plugin, its benefits, and how to use it.
+                We will also explore how Prettier improves TypeScript, CSS, and
+                HTML code by looking at some code samples.
               </div>
             </div>
           </div>
