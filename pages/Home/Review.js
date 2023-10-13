@@ -36,7 +36,7 @@ const Review = () => {
                 
                 <Slider {...sliderSettings}>
                     <div className="shadow rounded bg-white text-center p-4">
-                        <div className="p text-center">
+                        <div className="text-center">
                            
                             <Image src={avatarMale} className="w-25 h-25 client-img" alt="client-img"/>
                         </div>

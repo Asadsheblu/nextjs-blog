@@ -150,6 +150,7 @@ body {
 /* Client say section */
 .client-img {
     border-radius: 50%;
+    align-items: center;
 }
 
 /* Counter section */
