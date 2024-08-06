@@ -50,6 +50,8 @@ const JoditWrapper = forwardRef(({ initialContent = '', onChange = () => {} }, r
   );
 });
 
+JoditWrapper.displayName = 'JoditWrapper';
+
 JoditWrapper.propTypes = {
   initialContent: PropTypes.string,
   onChange: PropTypes.func,
