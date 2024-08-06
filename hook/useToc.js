@@ -1,27 +1,27 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { parse } from 'node-html-parser';
 
-export const useToc = (content) => {
-  const [toc, setToc] = useState([]);
-  const [updatedContent, setUpdatedContent] = useState(content);
+export const useToc = (htmlContent) => {
+  const [headings, setHeadings] = useState([]);
+  const [contentWithIds, setContentWithIds] = useState(htmlContent);
 
   useEffect(() => {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(content, 'text/html');
-    const headings = Array.from(doc.querySelectorAll('h1, h2, h3, h4, h5, h6'));
+    if (htmlContent) {
+      const root = parse(htmlContent);
+      const headingsArray = [];
+      root.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach((heading, index) => {
+        const id = `heading-${index}`;
+        heading.setAttribute('id', id);
+        headingsArray.push({
+          id,
+          title: heading.text,
+          level: parseInt(heading.tagName[1], 10),
+        });
+      });
+      setHeadings(headingsArray);
+      setContentWithIds(root.toString());
+    }
+  }, [htmlContent]);
 
-    const tocItems = headings.map((heading, index) => {
-      const id = `toc-${index}`;
-      heading.id = id;
-      return {
-        id,
-        title: heading.innerText,
-        level: parseInt(heading.tagName.replace('H', ''), 10),
-      };
-    });
-
-    setToc(tocItems);
-    setUpdatedContent(doc.body.innerHTML);
-  }, [content]);
-
-  return [toc, updatedContent];
+  return [headings, contentWithIds];
 };

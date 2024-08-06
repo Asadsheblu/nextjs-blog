@@ -8,7 +8,7 @@ import Breadcrumb from '../Breadcrumb';
 import Comments from '../../components/Comments';
 import { useToc } from '../../hook/useToc';
 import TableOfContents from '../../components/TableOfContents';
-import ReactDOMServer from 'react-dom/server'; // Import ReactDOMServer
+import ReactDOMServer from 'react-dom/server';
 import {
   FacebookShareButton,
   TwitterShareButton,
@@ -18,7 +18,6 @@ import {
   LinkedinIcon
 } from 'react-share';
 
-// Helper function to get the correct title and content
 const getTitle = (translation) => translation.title || translation.Title || '';
 const getContent = (translation) => translation.content || translation.Content || '';
 
