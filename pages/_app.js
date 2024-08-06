@@ -4,6 +4,7 @@ import Head from 'next/head';
 import Script from 'next/script';
 import Navbar from './Navbar';
 import nextI18NextConfig from '../next-i18next.config';
+import Footer from './Footer';
 
 function MyApp({ Component, pageProps }) {
   return (
@@ -27,6 +28,7 @@ function MyApp({ Component, pageProps }) {
       ></Script>
       <Navbar />
       <Component {...pageProps} />
+      <Footer/>
     </>
   );
 }
