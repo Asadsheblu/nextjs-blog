@@ -10,7 +10,7 @@ const TableOfContents = ({ headings }) => {
 
   return (
     <div
-      className="table-of-contents"
+      className="table-of-contents mt-5"
       style={{
         background: '#f1f1f1',
         borderRadius: '5px',

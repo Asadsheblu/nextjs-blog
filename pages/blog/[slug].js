@@ -4,11 +4,11 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { ClipLoader } from 'react-spinners';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import Image from 'next/image';
 import Breadcrumb from '../Breadcrumb';
 import Comments from '../../components/Comments';
 import { useToc } from '../../hook/useToc';
 import TableOfContents from '../../components/TableOfContents';
+import ReactDOMServer from 'react-dom/server'; // Import ReactDOMServer
 import {
   FacebookShareButton,
   TwitterShareButton,
@@ -21,6 +21,16 @@ import {
 // Helper function to get the correct title and content
 const getTitle = (translation) => translation.title || translation.Title || '';
 const getContent = (translation) => translation.content || translation.Content || '';
+
+const insertTocBeforeFirstHeading = (content, tocHtml) => {
+  const firstHeadingIndex = content.search(/<h[1-6][^>]*>/);
+  if (firstHeadingIndex === -1) return content; // No heading found, return original content
+
+  const beforeFirstHeading = content.slice(0, firstHeadingIndex);
+  const afterFirstHeading = content.slice(firstHeadingIndex);
+
+  return `${beforeFirstHeading}${tocHtml}${afterFirstHeading}`;
+};
 
 const BlogPost = ({ initialBlog }) => {
   const router = useRouter();
@@ -61,6 +71,10 @@ const BlogPost = ({ initialBlog }) => {
   const translation = blog?.translations ? blog.translations[locale] || {} : {};
   const content = getContent(translation);
   const [toc, updatedContent] = useToc(content);
+
+  // Insert TOC before the first heading
+  const tocHtml = toc ? ReactDOMServer.renderToStaticMarkup(<TableOfContents headings={toc} />) : '';
+  const contentWithToc = insertTocBeforeFirstHeading(updatedContent, tocHtml);
 
   useEffect(() => {
     if (blog && blog.translations) {
@@ -192,10 +206,7 @@ const BlogPost = ({ initialBlog }) => {
             <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-8">
               <div className="p-6 bg-white border-b border-gray-200">
                 <h1 className="text-3xl font-bold mb-4">{title}</h1>
-                <div className="mb-4">
-                  <TableOfContents headings={toc} />
-                </div>
-                <div className="my-4" dangerouslySetInnerHTML={{ __html: updatedContent }} />
+                <div className="my-4" dangerouslySetInnerHTML={{ __html: contentWithToc }} />
                 <div className="my-8">
                   <h3 className="text-lg font-bold mb-4">Share this post</h3>
                   <div className="flex space-x-4">
