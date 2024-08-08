@@ -95,7 +95,7 @@ function Navbar() {
     })),
     { key: 'About Us', href: '/about', dropdown: false },
     { key: 'Contact Us', href: '/contact', dropdown: false },
-    ...(isLoggedIn ? [{ key: 'Dashboard', href: '/dashboard/dashboard', dropdown: false }] : []),
+    ...(isLoggedIn ? [{ key: 'Dashboard', href: '/dashbaord/dashbaord', dropdown: false }] : []),
   ];
 
   const handleLogout = () => {

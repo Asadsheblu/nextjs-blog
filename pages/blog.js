@@ -4,9 +4,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { ClipLoader } from 'react-spinners';
-import { FaArrowRight, FaCalendar, FaUserCircle } from 'react-icons/fa';
+import { FaCalendar, FaUserCircle } from 'react-icons/fa';
 import { i18n } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { format } from 'date-fns';
+import PromoSection from '../components/BlogPromoSection';
 
 const createSlug = (title) => {
   return title
@@ -140,7 +142,7 @@ const BlogSection = ({ initialBlogs = [] }) => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5">
+    <div className=''>
       <title>Ytubetools || Blog</title>
       <meta name="description" content="Blog Page" />
       <meta property="og:url" content="https://ytubetools.com/blog" />
@@ -149,8 +151,14 @@ const BlogSection = ({ initialBlogs = [] }) => {
         content="Enhance your YouTube experience with our comprehensive suite of tools designed for creators and viewers alike. Extract video summaries, titles, descriptions, and more. Boost your channel's performance with advanced features and insights"
       />
 
-      <div className="container mx-auto px-4 p-5">
+      <PromoSection /> {/* Add the new promo section here */}
+
+      <div className="max-w-7xl container">
+        {/* Latest Blogs Section */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mt-8">
+          <div className="col-span-12">
+            <h2 className="text-2xl text-blue-900 font-bold mb-2">Latest Blog</h2>
+          </div>
           <div className="col-span-12 md:col-span-5">
             {currentBlogs.slice(0, 1).map((blog, index) => {
               const content = blog.translations[currentLanguage];
@@ -171,17 +179,17 @@ const BlogSection = ({ initialBlogs = [] }) => {
                       </div>
                     </div>
                   )}
-                  <div className="border-t ps-4 pe-4 pt-2 d-flex">
+                  <div className="border-t ps-3 pe-3 pt-2 d-flex">
                     <p className="text-sm text-gray-500">
                       <FaUserCircle className="text-center fs-6 text-red-400 inline" /> {blog.author}
                     </p>
                     <p className="text-sm text-gray-500 ms-auto">
                       <FaCalendar className="text-center text-red-400 inline" />
-                      {new Date(blog.createdAt).toLocaleDateString()}
+                      {format(new Date(blog.createdAt), 'dd/MM/yyyy')}
                     </p>
                   </div>
-                  <div className="p-6">
-                    <h6 className="text-3xl font-semibold">
+                  <div className="p-3">
+                    <h6 className="text-lg font-semibold">
                       <Link href={`/blog/${content.slug}`} passHref>
                         <span className="text-blue-500 hover:underline">{getTitle(content)}</span>
                       </Link>
@@ -236,7 +244,7 @@ const BlogSection = ({ initialBlogs = [] }) => {
                       </p>
                       <p className="text-sm text-gray-500 ms-auto">
                         <FaCalendar className="text-center text-red-400 inline" />
-                        {new Date(blog.createdAt).toLocaleDateString()}
+                        {format(new Date(blog.createdAt), 'dd/MM/yyyy')}
                       </p>
                     </div>
                   
@@ -246,26 +254,31 @@ const BlogSection = ({ initialBlogs = [] }) => {
             })}
           </div>
         </div>
-
-        <div className="bg-red-500 text-white p-10 rounded-lg relative w-full text-center mt-5 mb-5">
-          <div className="mt-10">
-            <h2 className="text-2xl text-white font-bold mb-2">SUBSCRIBE TO OUR NEWSLETTER</h2>
-            <p className="mb-4">
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Deleniti aliquid molestias voluptatem fugiat provident tenetur saepe hic
-              consectet.
-            </p>
-            <form className="flex justify-center" onSubmit={(e) => e.preventDefault()}>
-              <input type="email" placeholder="Email Address" className="w-full max-w-xs p-3 rounded-l-md focus:outline-none" />
-              <button type="submit" className="bg-red-600 p-3 rounded-r-md">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
-              </button>
-            </form>
-          </div>
+        <div className="bg-[#f7f3ff] bg py-8 pt-5 pb-5 px-5 md:px-10 flex items-center justify-center rounded-lg shadow-md my-10">
+      <div className="max-w-5xl w-full grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+        <div className="col-span-12 md:col-span-5 text-center md:text-left">
+          <h2 className="text-2xl md:text-3xl font-semibold text-gray-800">Subscribe to our newsletter.</h2>
+          <p className="text-gray-600 mt-2">Join 80,000 others!</p>
         </div>
+        <div className="col-span-12 md:col-span-7">
+          <form className="flex flex-col items-center md:flex-row w-full">
+            <input
+              type="email"
+              placeholder="Email Address"
+              className="w-full md:flex-1 p-3 rounded-l-md border border-gray-300 focus:outline-none"
+            />
+            <button type="submit" className="bg-purple-700 text-white p-3 rounded-r-md">
+              Sign Up
+            </button>
+          </form>
+          <p className="text-gray-600 text-xs mt-3 md:mt-1 text-center md:text-left">
+            By signing up, you agree to our <Link href="/privacy-policy"><span className="text-purple-600">Privacy Policy</span></Link>
+          </p>
+        </div>
+      </div>
+    </div>
 
-        <div className="bg-blue-900 text-white p-10 rounded-lg relative w-full mt-5 mb-5">
+        <div className="text-white  rounded-lg relative w-full mt-5 mb-5">
           <div className="mb-4">
             <ul className="flex flex-wrap space-x-2 bg-blue-900 text-white px-4 py-2 rounded-lg overflow-auto">
               <li className={`px-3 py-2 list-none rounded-md text-sm font-medium ${!selectedCategory ? 'bg-blue-700' : ''}`}>
@@ -306,7 +319,7 @@ const BlogSection = ({ initialBlogs = [] }) => {
                     </p>
                     <p className="text-sm text-gray-500 ms-auto">
                       <FaCalendar className="text-center text-red-400 inline" />
-                      {new Date(blog.createdAt).toLocaleDateString()}
+                      {format(new Date(blog.createdAt), 'dd/MM/yyyy')}
                     </p>
                   </div>
                   <div className="p-4">

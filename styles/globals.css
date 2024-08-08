@@ -637,3 +637,76 @@ tbody{
 .info{
   margin-top: -60px;
 }
+
+.promo-section {
+  background-color: #edebe4;
+}
+
+.promo-text {
+  text-align: left;
+}
+
+.promo-images {
+  display: flex;
+  gap: 1rem;
+  position: relative;
+}
+
+.promo-images .promo-image {
+  position: relative;
+}
+
+.promo-images .promo-image .rounded-full {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+}
+
+.promo-images .promo-image .bg-red-500 {
+  background-color: #ef4444;
+}
+
+.promo-images .promo-image .bg-white {
+  background-color: #ffffff;
+}
+.test{
+  margin-top: 100px;
+}
+.red-test {
+  margin-left: 240px;
+  top: 260px;
+  
+  /* margin-top: 90px !important; */
+}
+.white-test{
+  margin-right: 215px;
+  top: -120px;
+
+}
+.bg{
+  background-image: url('../public/Newsletter-CTA.png') !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-size: cover !important;
+}
+.btn-danger{
+  background-color: #ef3d3d;
+}
+@media (max-width: 700px) {
+  .w-\[305px\] {
+    width: 160px;
+}
+.h-\[250px\] {
+    height: 130px;
+}
+.red-test {
+  margin-left: 120px;
+  top: 140px;
+  /* margin-top: 90px !important; */
+}
+.white-test{
+  margin-right: 100px;
+  top: -80px;
+
+}
+}
