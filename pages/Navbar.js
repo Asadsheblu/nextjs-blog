@@ -9,7 +9,7 @@ import 'nprogress/nprogress.css'; // Add this line
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import Image from 'next/image';
-import logo from "../public/yt icon.png"
+import logo from "../public/yt icon.png";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
@@ -88,9 +88,14 @@ function Navbar() {
 
   const navigation = [
     { key: 'Home', href: '/', dropdown: false },
+    ...categories.slice(0, 3).map((category) => ({
+      key: category.name,
+      href: `/categories/${category.slug}`,
+      dropdown: false,
+    })),
     { key: 'About Us', href: '/about', dropdown: false },
     { key: 'Contact Us', href: '/contact', dropdown: false },
-    ...(isLoggedIn ? [{ key: 'Dashboard', href: '/dashbaord/dashbaord', dropdown: false }] : []),
+    ...(isLoggedIn ? [{ key: 'Dashboard', href: '/dashboard/dashboard', dropdown: false }] : []),
   ];
 
   const handleLogout = () => {
@@ -124,14 +129,6 @@ function Navbar() {
                           'px-3 py-2 rounded-md text-sm font-medium'
                         )}>
                           {t(item.key)}
-                        </Link>
-                      ))}
-                      {categories.slice(0, 3).map((category) => (
-                        <Link key={category._id} href={`/categories/${category.slug}`} className={classNames(
-                          router.pathname === `/categories/${category.slug}` ? 'bg-gray-700 text-white' : 'text-gray-300 hover:text-red-500 hover:bg-gray-700',
-                          'px-3 py-2 rounded-md text-sm font-medium'
-                        )}>
-                          {category.name}
                         </Link>
                       ))}
                     </div>
@@ -205,14 +202,6 @@ function Navbar() {
                     'block px-3 py-2 rounded-md text-base font-medium'
                   )}>
                     {t(item.key)}
-                  </Link>
-                ))}
-                {categories.slice(0, 3).map((category) => (
-                  <Link key={category._id} href={`/categories/${category.slug}`} className={classNames(
-                    router.pathname === `/categories/${category.slug}` ? 'bg-gray-700 text-white' : 'text-gray-300 hover:text-red-500 hover:bg-gray-700',
-                    'block px-3 py-2 rounded-md text-base font-medium'
-                  )}>
-                    {category.name}
                   </Link>
                 ))}
                 <div className="flex lan items-center justify-center lan mt-4 space-x-4">
