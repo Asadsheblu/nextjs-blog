@@ -3,7 +3,7 @@ import axios from 'axios';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ClipLoader } from 'react-spinners';
-import { FaArrowRight } from 'react-icons/fa';
+import { FaArrowRight, FaCalendar, FaUserCircle } from 'react-icons/fa';
 import { i18n } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
@@ -127,68 +127,46 @@ const BlogSection = ({ initialBlogs = [] }) => {
       />
 
       <div className="container mx-auto px-4 p-5">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 mt-8">
-          <div>
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mt-8">
+          <div className="col-span-12 md:col-span-5">
             {currentBlogs.slice(0, 1).map((blog, index) => {
               const content = blog.translations[currentLanguage];
               return (
-                <div key={index} className="bg-white shadow-md rounded-lg overflow-hidden">
+                <div key={index} className="bg-white shadow-md rounded-lg overflow-hidden relative">
                   {content?.image && (
-                    <div className="w-full md:w-1/2">
+                    <div className="w-full relative">
                       <Image
                         src={content.image}
                         alt={getTitle(content)}
-                        width={300}
-                        height={200}
+                        width={400}
+                        height={300}
                         layout="responsive"
                         objectFit="cover"
                       />
+                      <div className="absolute top-2 left-2 bg-blue-500 text-white text-sm rounded-full px-2 py-1">
+                        <span className="mr-2">{content?.category}</span>
+                      </div>
                     </div>
                   )}
-                  <div className="p-6">
-                    <h3 className="text-3xl font-semibold mb-2">
-                      <Link href={`/blog/${content.slug}`} passHref>
-                        <span className="text-blue-500 hover:underline">{getTitle(content)}</span>
-                      </Link>
-                    </h3>
-                    <p className="text-gray-600 mb-4">{content.description || content.Description}</p>
-                    <p className="text-gray-500 text-sm">By {blog.author} · {new Date(blog.createdAt).toLocaleDateString()}</p>
-                    <div className="mt-2">
-                      {parseCategories(blog.category).map((category, i) => (
-                        <span key={i} className="text-sm bg-gray-200 text-gray-700 rounded-full px-2 py-1 mr-2">{category}</span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-          <div className="space-y-4">
-            {currentBlogs.slice(1, 4).map((blog, index) => {
-              const content = blog.translations[currentLanguage];
-              return (
-                <div key={index} className="bg-white shadow-md rounded-lg overflow-hidden flex flex-col md:flex-row">
-                  {content?.image && (
-                    <div className="w-full md:w-1/2">
-                      <Image
-                        src={content.image}
-                        alt={getTitle(content)}
-                        width={300}
-                        height={200}
-                        layout="responsive"
-                        objectFit="cover"
-                      />
-                    </div>
-                  )}
-                  <div className="p-4 flex-1">
-                    <h4 className="text-lg font-semibold">
-                      <Link href={`/blog/${content.slug}`} passHref>
-                        <span className="text-blue-500 hover:underline">{getTitle(content)}</span>
-                      </Link>
-                    </h4>
-                    <p className="text-gray-500 text-sm">
-                      By {blog.author} · {new Date(blog.createdAt).toLocaleDateString()}
+                  <div className="border-t ps-4 pe-4 pt-2 d-flex">
+                    <p className="text-sm text-gray-500">
+                      <FaUserCircle className="text-center fs-6 text-red-400 inline" /> {blog.author}
                     </p>
+                    <p className="text-sm text-gray-500 ms-auto">
+                      <FaCalendar className="text-center text-red-400 inline" />
+                      {new Date(blog.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div className="p-6">
+                    <h6 className="text-3xl font-semibold">
+                      <Link href={`/blog/${content.slug}`} passHref>
+                        <span className="text-blue-500 hover:underline">{getTitle(content)}</span>
+                      </Link>
+                    </h6>
+                    <p className="text-gray-600 mb-4">{content.description || content.Description}</p>
+                    <Link href={`/blog/${content.slug}`} passHref>
+                      <span className="text-red-500 mt-4 block">Read More →</span>
+                    </Link>
                     <div className="mt-2">
                       {parseCategories(blog.category).map((category, i) => (
                         <span key={i} className="text-sm bg-gray-200 text-gray-700 rounded-full px-2 py-1 mr-2">
@@ -201,12 +179,58 @@ const BlogSection = ({ initialBlogs = [] }) => {
               );
             })}
           </div>
+          <div className="col-span-12 md:col-span-7 space-y-4">
+            {currentBlogs.slice(1, 4).map((blog, index) => {
+              const content = blog.translations[currentLanguage];
+              return (
+                <div key={index} className="bg-white shadow-md rounded-lg overflow-hidden flex flex-col md:flex-row relative">
+                  {content?.image && (
+                    <div className="w-full md:mt-2 md:w-1/2" style={{ height: '140px', position: 'relative' }}>
+                      <Image
+                        src={content.image}
+                        alt={getTitle(content)}
+                        layout="fill"
+                        objectFit="cover"
+                        className='rounded'
+                      />
+                      <div className="absolute top-2 left-2 bg-blue-500 text-white text-sm rounded-full px-2 py-1">
+                        <span className="mr-2">{content?.category}</span>
+                      </div>
+                    </div>
+                  )}
+                  <div className="ps-2 pt-2 flex-1">
+                    <h6 className="text-lg font-semibold">
+                      <Link href={`/blog/${content.slug}`} passHref>
+                        <span className="text-blue-500 hover:underline">{getTitle(content)}</span>
+                      </Link>
+                    </h6>
+                    <Link href={`/blog/${content.slug}`} passHref>
+                      <span className="text-red-500 mt-4 block">Read More →</span>
+                    </Link>
+                    <div className="border-t ps-2 pe-2 pt-2 d-flex">
+                      <p className="text-sm text-gray-500">
+                        <FaUserCircle className="text-center fs-6 text-red-400 inline" /> {blog.author}
+                      </p>
+                      <p className="text-sm text-gray-500 ms-auto">
+                        <FaCalendar className="text-center text-red-400 inline" />
+                        {new Date(blog.createdAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                  
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
 
         <div className="bg-red-500 text-white p-10 rounded-lg relative w-full text-center mt-5 mb-5">
           <div className="mt-10">
             <h2 className="text-2xl text-white font-bold mb-2">SUBSCRIBE TO OUR NEWSLETTER</h2>
-            <p className="mb-4">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Deleniti aliquid molestias voluptatem fugiat provident tenetur saepe hic consectet.</p>
+            <p className="mb-4">
+              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Deleniti aliquid molestias voluptatem fugiat provident tenetur saepe hic
+              consectet.
+            </p>
             <form className="flex justify-center" onSubmit={(e) => e.preventDefault()}>
               <input type="email" placeholder="Email Address" className="w-full max-w-xs p-3 rounded-l-md focus:outline-none" />
               <button type="submit" className="bg-red-600 p-3 rounded-r-md">
@@ -222,7 +246,7 @@ const BlogSection = ({ initialBlogs = [] }) => {
           {currentBlogs.slice(4).map((blog, index) => {
             const content = blog.translations[currentLanguage];
             return (
-              <div key={index} className="bg-white shadow-md rounded-lg overflow-hidden">
+              <div key={index} className="bg-white shadow-md rounded-lg overflow-hidden relative">
                 {content.image && (
                   <Image
                     src={content.image}
@@ -233,20 +257,34 @@ const BlogSection = ({ initialBlogs = [] }) => {
                     className="object-cover rounded-lg"
                   />
                 )}
+                <div className="absolute top-2 left-2 bg-blue-500 text-white text-sm rounded-full px-2 py-1">
+                  <span className="mr-2">{content?.category}</span>
+                </div>
+                <div className="border-t ps-4 pe-4 pt-2 d-flex">
+                  <p className="text-sm text-gray-500">
+                    <FaUserCircle className="text-center fs-6 text-red-400 inline" /> {blog.author}
+                  </p>
+                  <p className="text-sm text-gray-500 ms-auto">
+                    <FaCalendar className="text-center text-red-400 inline" />
+                    {new Date(blog.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
                 <div className="p-4">
                   <h4 className="text-lg font-semibold">
                     <Link href={`/blog/${content.slug}`} passHref>
                       <span className="text-blue-500 hover:underline">{getTitle(content)}</span>
                     </Link>
                   </h4>
-                  <p className="text-gray-500 text-sm">By {blog.author} · {new Date(blog.createdAt).toLocaleDateString()}</p>
+                  <p className="text-gray-500 text-sm">{content?.description}</p>
                   <div className="mt-2">
                     {parseCategories(blog.category).map((category, i) => (
-                      <span key={i} className="text-sm bg-gray-200 text-gray-700 rounded-full px-2 py-1 mr-2">{category}</span>
+                      <span key={i} className="text-sm bg-gray-200 text-gray-700 rounded-full px-2 py-1 mr-2">
+                        {category}
+                      </span>
                     ))}
                   </div>
                   <Link href={`/blog/${content.slug}`} passHref>
-                    <span className="text-red-500 hover:underline mt-3"><span>Read More <FaArrowRight /></span></span>
+                    <span className="text-red-500 mt-4 block">Read More →</span>
                   </Link>
                 </div>
               </div>

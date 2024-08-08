@@ -3,11 +3,13 @@ import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import Image from 'next/image';
 import 'flag-icons/css/flag-icons.min.css'; // Import flag-icons CSS
 import NProgress from 'nprogress'; // Add this line
 import 'nprogress/nprogress.css'; // Add this line
 import { useTranslation } from 'react-i18next';
+import axios from 'axios';
+import Image from 'next/image';
+import logo from "../public/yt icon.png"
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
@@ -35,6 +37,29 @@ function Navbar() {
   const router = useRouter();
   const { t, i18n } = useTranslation('navbar');
   const [selectedLanguage, setSelectedLanguage] = useState(i18n.language || 'en');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    const user = localStorage.getItem('user');
+    if (user) {
+      setIsLoggedIn(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    // Fetch categories from the API
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get('/api/categories'); // Update this URL to your actual API endpoint
+        setCategories(response.data);
+      } catch (error) {
+        console.error('Error fetching categories:', error.message);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const changeLanguage = async (lang) => {
     if (availableLanguages.find(l => l.code === lang)) {
@@ -62,10 +87,17 @@ function Navbar() {
   }, [router]);
 
   const navigation = [
-    { key: "Home", href: '/', dropdown: false },
+    { key: 'Home', href: '/', dropdown: false },
     { key: 'About Us', href: '/about', dropdown: false },
     { key: 'Contact Us', href: '/contact', dropdown: false },
+    ...(isLoggedIn ? [{ key: 'Dashboard', href: '/dashbaord/dashbaord', dropdown: false }] : []),
   ];
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    setIsLoggedIn(false);
+    router.push('/login');
+  };
 
   return (
     <>
@@ -82,16 +114,7 @@ function Navbar() {
                 </div>
                 <div className="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
                   <div className="flex-shrink-0 flex items-center">
-                    {/* <Link href='/'>
-                      <Image
-                        src={logo}
-                        alt="YouTube Tools Logo"
-                        height="70"
-                        width="150"
-                        priority 
-                      />
-                    </Link> */}
-                    Blog
+                    <Image src={logo} width={128} height={64} />
                   </div>
                   <div className="hidden sm:block sm:ml-6 mx-auto">
                     <div className="flex space-x-4">
@@ -101,6 +124,14 @@ function Navbar() {
                           'px-3 py-2 rounded-md text-sm font-medium'
                         )}>
                           {t(item.key)}
+                        </Link>
+                      ))}
+                      {categories.slice(0, 3).map((category) => (
+                        <Link key={category._id} href={`/categories/${category.slug}`} className={classNames(
+                          router.pathname === `/categories/${category.slug}` ? 'bg-gray-700 text-white' : 'text-gray-300 hover:text-red-500 hover:bg-gray-700',
+                          'px-3 py-2 rounded-md text-sm font-medium'
+                        )}>
+                          {category.name}
                         </Link>
                       ))}
                     </div>
@@ -146,13 +177,23 @@ function Navbar() {
                       </Transition>
                     </Menu>
                   </div>
-                  
-                  <Link href="/login">
-                    <button className="text-gray-300 bg-red-700 hover:text-red-500 hover:bg-gray-700 px-3 py-2 rounded-md text-sm font-medium">
-                      {t('Login')}
-                    </button>
-                  </Link>
-               
+
+                  {isLoggedIn ? (
+                    <>
+                      <button
+                        onClick={handleLogout}
+                        className="text-gray-300 bg-red-700 hover:text-red-500 hover:bg-gray-700 px-3 py-2 ml-4 rounded-md text-sm font-medium"
+                      >
+                        {t('Logout')}
+                      </button>
+                    </>
+                  ) : (
+                    <Link href="/login">
+                      <button className="text-gray-300 bg-red-700 hover:text-red-500 hover:bg-gray-700 px-3 py-2 rounded-md text-sm font-medium">
+                        {t('Login')}
+                      </button>
+                    </Link>
+                  )}
                 </div>
               </div>
             </div>
@@ -164,6 +205,14 @@ function Navbar() {
                     'block px-3 py-2 rounded-md text-base font-medium'
                   )}>
                     {t(item.key)}
+                  </Link>
+                ))}
+                {categories.slice(0, 3).map((category) => (
+                  <Link key={category._id} href={`/categories/${category.slug}`} className={classNames(
+                    router.pathname === `/categories/${category.slug}` ? 'bg-gray-700 text-white' : 'text-gray-300 hover:text-red-500 hover:bg-gray-700',
+                    'block px-3 py-2 rounded-md text-base font-medium'
+                  )}>
+                    {category.name}
                   </Link>
                 ))}
                 <div className="flex lan items-center justify-center lan mt-4 space-x-4">

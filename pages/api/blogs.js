@@ -86,6 +86,7 @@ export default async function handler(req, res) {
   }
 }
 
+// Existing code...
 const handlePostRequest = async (req, res, blogs) => {
   try {
     await runMiddleware(req, res, upload.single('image'));
@@ -112,6 +113,8 @@ const handlePostRequest = async (req, res, blogs) => {
           [`translations.${language}.category`]: category,
           [`translations.${language}.image`]: image,
           [`translations.${language}.slug`]: slug,
+          author,
+          authorProfile
         },
       };
 
@@ -159,6 +162,9 @@ const handlePostRequest = async (req, res, blogs) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+// Existing code...
+
 
 const handleGetRequest = async (req, res, blogs, query) => {
   try {

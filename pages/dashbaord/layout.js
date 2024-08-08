@@ -3,10 +3,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import {
   FaTachometerAlt,
-  FaUsers,
-  FaInfoCircle,
-  FaLock,
-  FaFileAlt,
   FaChevronDown,
   FaChevronRight,
   FaFolderOpen,
@@ -18,6 +14,7 @@ import {
   FaKey,
   FaInfo,
   FaFile,
+  FaUserAlt,
 } from 'react-icons/fa';
 import { FaDownLeftAndUpRightToCenter } from 'react-icons/fa6';
 
@@ -145,6 +142,17 @@ const Layout = ({ children }) => {
               }`}
             >
               <FaDownLeftAndUpRightToCenter className="mr-3 text-red-500" /> <span className="mx-3">Commnet</span>
+            </p>
+          </Link>
+          <Link href="/dashbaord/authors" passHref>
+            <p
+              className={`flex items-center mt-4 py-2 px-6 cursor-pointer rounded-md ${
+                isActiveRoute('/dashbaord/authors')
+                  ? 'bg-gray-300 text-gray-700'
+                  : 'text-gray-600 hover:bg-gray-200 hover:text-gray-700'
+              }`}
+            >
+              <FaUserAlt className="mr-3 text-red-500" /> <span className="mx-3">Author</span>
             </p>
           </Link>
     

@@ -3,11 +3,9 @@ import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-
 const Comment = ({ comment, slug, onReply }) => {
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [replyContent, setReplyContent] = useState('');
-
 
   const handleReplySubmit = async (e) => {
     e.preventDefault();
@@ -17,8 +15,6 @@ const Comment = ({ comment, slug, onReply }) => {
         content: replyContent,
         parentId: comment._id,
       });
-      console.log(response);
-      
       onReply(response.data.comment);
       setShowReplyForm(false);
       setReplyContent('');
@@ -27,7 +23,6 @@ const Comment = ({ comment, slug, onReply }) => {
       console.error('Error posting reply:', error);
     }
   };
-
 
   return (
     <div className={`mb-6 p-4 border border-gray-200 rounded-lg bg-white shadow-sm ${comment.approved ? '' : 'opacity-50'}`}>
@@ -110,7 +105,6 @@ const Comments = ({ slug }) => {
       setComments(response.data);
     } catch (error) {
       console.error('Error fetching comments:', error);
-      setError('Failed to load comments.');
     }
   };
 
@@ -167,24 +161,25 @@ const Comments = ({ slug }) => {
   };
 
   return (
-    <div className="mt-8 max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-w-full">
       <ToastContainer />
-      <h2 className="text-3xl font-bold mb-6">Comments</h2>
+      <h2 className="text-3xl font-bold mb-6">Leave Comments</h2>
       <form onSubmit={handleCommentSubmit} className="mb-6">
         <input
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Your name"
-          className="w-full p-4 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+          className="w-full md:w-1/2  p-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
           required
         />
+        <br/>
         <input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Your email"
-          className="w-full p-4 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+          className="w-full md:w-1/2 p-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
           required
         />
         <textarea
@@ -198,7 +193,7 @@ const Comments = ({ slug }) => {
         <div className="mb-4">
           <label htmlFor="captcha" className="block text-gray-700 font-bold mb-2">Captcha</label>
           <div
-            className="captcha mb-2 bg-gray-200 p-2 rounded-md"
+            className="captcha md:w-1/2  mb-2 bg-gray-200 p-2 rounded-md"
             style={{
               filter: 'blur(2px)',
               fontFamily: "'Courier New', Courier, monospace",
@@ -218,7 +213,7 @@ const Comments = ({ slug }) => {
             value={captchaInput}
             onChange={(e) => setCaptchaInput(e.target.value)}
             placeholder="Enter captcha"
-            className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+            className="w-full md:w-1/2  p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
             required
           />
           {captchaError && <p className="text-red-500 mt-2">{captchaError}</p>}

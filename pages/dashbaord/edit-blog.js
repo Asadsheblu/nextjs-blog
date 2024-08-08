@@ -24,9 +24,12 @@ function EditBlog() {
   const [isDraft, setIsDraft] = useState(false);
   const [language, setLanguage] = useState('en'); // Default language
   const [initialImage, setInitialImage] = useState(null);
+  const [authors, setAuthors] = useState([]); // Authors list
+  const [selectedAuthor, setSelectedAuthor] = useState(''); // Selected author
 
   useEffect(() => {
     fetchCategories();
+    fetchAuthors();
     if (id) {
       fetchBlogData(id, language);
     }
@@ -42,6 +45,19 @@ function EditBlog() {
       setCategories(data);
     } catch (error) {
       console.error('Error fetching categories:', error.message);
+    }
+  };
+
+  const fetchAuthors = async () => {
+    try {
+      const response = await fetch('/api/authors');
+      if (!response.ok) {
+        throw new Error('Failed to fetch authors');
+      }
+      const data = await response.json();
+      setAuthors(data);
+    } catch (error) {
+      console.error('Error fetching authors:', error.message);
     }
   };
 
@@ -61,6 +77,7 @@ function EditBlog() {
         setMetaDescription(translation.metaDescription);
         setDescription(translation.description);
         setInitialImage(translation.image);
+        setSelectedAuthor(data.author); // Set the selected author
       } else {
         // Clear the form if the translation for the selected language does not exist
         setQuillContent('');
@@ -69,6 +86,7 @@ function EditBlog() {
         setMetaTitle('');
         setMetaDescription('');
         setDescription('');
+        setSelectedAuthor(''); // Clear the selected author
       }
       setIsDraft(data.isDraft);
     } catch (error) {
@@ -91,7 +109,7 @@ function EditBlog() {
         formData.append('image', image);
       }
       formData.append('category', selectedCategory);
-      formData.append('author', 'Admin'); // Set author to "Admin"
+      formData.append('author', selectedAuthor); // Set selected author
       formData.append('authorProfile', ''); // No author profile
       formData.append('createdAt', new Date().toISOString());
       formData.append('isDraft', JSON.stringify(isDraft));
@@ -118,7 +136,7 @@ function EditBlog() {
       console.error('Error updating content:', error.message);
       setError(error.message);
     }
-  }, [quillContent, selectedCategory, metaTitle, metaDescription, description, title, image, isDraft, id, router, language]);
+  }, [quillContent, selectedCategory, metaTitle, metaDescription, description, title, image, isDraft, id, router, language, selectedAuthor]);
 
   const handleQuillChange = useCallback((newContent) => {
     setQuillContent(newContent);
@@ -141,6 +159,10 @@ function EditBlog() {
 
   const handleLanguageChange = (e) => {
     setLanguage(e.target.value);
+  };
+
+  const handleAuthorChange = (e) => {
+    setSelectedAuthor(e.target.value);
   };
 
   return (
@@ -248,6 +270,20 @@ function EditBlog() {
               className="w-full border border-gray-300 rounded-lg p-3 shadow-sm"
             />
             <p className="text-gray-600 text-sm mt-1">Description max 200 characters</p>
+          </div>
+          <div className="mb-3">
+            <label htmlFor="author" className="block mb-2 text-lg font-medium">Author*</label>
+            <select
+              id="author"
+              value={selectedAuthor}
+              onChange={handleAuthorChange}
+              className="w-full border border-gray-300 rounded-lg p-3 shadow-sm"
+            >
+              <option value="" disabled>Select an author</option>
+              {authors.map((author) => (
+                <option key={author._id} value={author.name}>{author.name}</option>
+              ))}
+            </select>
           </div>
           <div className="mb-3">
             <label htmlFor="image" className="block mb-2 text-lg font-medium">Image</label>

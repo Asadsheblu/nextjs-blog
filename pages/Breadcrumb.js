@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-const Breadcrumb = ({ blogTitle }) => {
+const Breadcrumb = ({ categorySlug, categoryName, blogTitle }) => {
   return (
     <nav aria-label="breadcrumb">
       <ol className="breadcrumb flex items-center text-sm md:text-base lg:text-lg">
@@ -10,8 +10,8 @@ const Breadcrumb = ({ blogTitle }) => {
           </Link>
         </li>
         <li className="breadcrumb-item">
-          <Link href="/blog">
-            <span className="text-blue-500 hover:underline whitespace-nowrap"> / Blog</span>
+          <Link href={`/categories/${categorySlug}`}>
+            <span className="text-blue-500 hover:underline whitespace-nowrap"> / {categoryName}</span>
           </Link>
         </li>
         {blogTitle && (

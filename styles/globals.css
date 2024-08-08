@@ -633,3 +633,7 @@ tbody{
   display: flex;
   align-items: center;
 }
+
+.info{
+  margin-top: -60px;
+}

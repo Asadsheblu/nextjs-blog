@@ -17,6 +17,7 @@ import {
   TwitterIcon,
   LinkedinIcon
 } from 'react-share';
+import { FaFacebook, FaTwitter, FaLinkedin } from 'react-icons/fa';
 
 const getTitle = (translation) => translation.title || translation.Title || '';
 const getContent = (translation) => translation.content || translation.Content || '';
@@ -31,11 +32,12 @@ const insertTocBeforeFirstHeading = (content, tocHtml) => {
   return `${beforeFirstHeading}${tocHtml}${afterFirstHeading}`;
 };
 
-const BlogPost = ({ initialBlog }) => {
+const BlogPost = ({ initialBlog, initialAuthor }) => {
   const router = useRouter();
   const { slug } = router.query;
   const { locale } = router;
   const [blog, setBlog] = useState(initialBlog);
+  const [author, setAuthor] = useState(initialAuthor);
   const [loading, setLoading] = useState(!initialBlog);
   const [schemaData, setSchemaData] = useState(null);
   const [breadcrumbSchema, setBreadcrumbSchema] = useState(null);
@@ -54,8 +56,13 @@ const BlogPost = ({ initialBlog }) => {
 
           if (blog) {
             setBlog(blog);
-          }
 
+            // Fetch author information
+            const authorResponse = await axios.get(`/api/authors?name=${blog.author}`);
+            if (authorResponse.data.length > 0) {
+              setAuthor(authorResponse.data[0]);
+            }
+          }
         } catch (error) {
           console.error('Error fetching blogs:', error.message);
         } finally {
@@ -71,9 +78,10 @@ const BlogPost = ({ initialBlog }) => {
   const content = getContent(translation);
   const [toc, updatedContent] = useToc(content);
 
-  // Insert TOC before the first heading
   const tocHtml = toc ? ReactDOMServer.renderToStaticMarkup(<TableOfContents headings={toc} />) : '';
   const contentWithToc = insertTocBeforeFirstHeading(updatedContent, tocHtml);
+
+  const categoryName = translation.category || 'Blog';
 
   useEffect(() => {
     if (blog && blog.translations) {
@@ -122,8 +130,8 @@ const BlogPost = ({ initialBlog }) => {
             {
               "@type": "ListItem",
               "position": 2,
-              "name": "Blog",
-              "item": `https://${typeof window !== 'undefined' ? window.location.host : 'localhost:3000'}/blog`
+              "name": categoryName,
+              "item": `https://${typeof window !== 'undefined' ? window.location.host : 'localhost:3000'}/categories/${categoryName}`
             },
             {
               "@type": "ListItem",
@@ -201,7 +209,7 @@ const BlogPost = ({ initialBlog }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5">
         <div className="flex flex-col lg:flex-row">
           <div className="flex-grow order-1 lg:order-2">
-            <Breadcrumb blogTitle={title} />
+            <Breadcrumb categoryName={categoryName} blogTitle={title} />
             <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-8">
               <div className="p-6 bg-white border-b border-gray-200">
                 <h1 className="text-3xl font-bold mb-4">{title}</h1>
@@ -218,6 +226,34 @@ const BlogPost = ({ initialBlog }) => {
                     <LinkedinShareButton url={shareUrl} title={title}>
                       <LinkedinIcon size={32} round />
                     </LinkedinShareButton>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="p-6 mb-3 bg-blue-50 md:w-2/5 rounded-lg shadow-md">
+              <h2 className="text-2xl font-bold mb-4">About The Author</h2>
+              <hr/>
+              <div className="flex items-center">
+                <img src={author?.image} alt={author?.name} className="w-16 h-16 rounded-full mr-4" />
+                <div>
+                  <h3 className="text-xl font-bold pt-3">{author?.name}</h3>
+                  <p className="text-gray-700">{author?.bio}</p>
+                  <div className="flex mt-2 space-x-4">
+                    {author?.socialLinks?.facebook && (
+                      <a href={author.socialLinks.facebook} target="_blank" rel="noopener noreferrer">
+                        <FaFacebook size={24} />
+                      </a>
+                    )}
+                    {author?.socialLinks?.twitter && (
+                      <a href={author.socialLinks.twitter} target="_blank" rel="noopener noreferrer">
+                        <FaTwitter size={24} />
+                      </a>
+                    )}
+                    {author?.socialLinks?.linkedin && (
+                      <a href={author.socialLinks.linkedin} target="_blank" rel="noopener noreferrer">
+                        <FaLinkedin size={24} />
+                      </a>
+                    )}
                   </div>
                 </div>
               </div>
@@ -251,9 +287,14 @@ export async function getServerSideProps({ locale, params, req }) {
       };
     }
 
+    const authorResponse = await axios.get(`${protocol}://${host}/api/authors`);
+    const authors = authorResponse.data;
+    const author = authors.find(author => author.name === blog.author);
+
     return {
       props: {
         initialBlog: blog,
+        initialAuthor: author || null,
         ...(await serverSideTranslations(locale, ['common', 'navbar', 'footer'])),
       },
     };

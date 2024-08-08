@@ -21,13 +21,13 @@ function Blogs() {
   const [image, setImage] = useState(null);
   const [imageFile, setImageFile] = useState(null);
   const [categories, setCategories] = useState([]);
+  const [authors, setAuthors] = useState([]);
+  const [selectedAuthor, setSelectedAuthor] = useState('');
   const [isSlugEditable, setIsSlugEditable] = useState(false);
-
-  // Static username
-  const username = 'admin';
 
   useEffect(() => {
     fetchCategories();
+    fetchAuthors();
     const savedState = JSON.parse(localStorage.getItem('blogFormState'));
     if (savedState) {
       setQuillContent(savedState.quillContent || '');
@@ -39,6 +39,7 @@ function Blogs() {
       setDescription(savedState.description || '');
       setMetaDescription(savedState.metaDescription || '');
       setImage(savedState.image || null);
+      setSelectedAuthor(savedState.selectedAuthor || '');
     }
   }, []);
 
@@ -59,9 +60,10 @@ function Blogs() {
       description,
       metaDescription,
       image,
+      selectedAuthor,
     };
     localStorage.setItem('blogFormState', JSON.stringify(formState));
-  }, [quillContent, selectedCategory, selectedLanguage, slug, title, metaTitle, description, metaDescription, image]);
+  }, [quillContent, selectedCategory, selectedLanguage, slug, title, metaTitle, description, metaDescription, image, selectedAuthor]);
 
   const fetchCategories = async () => {
     try {
@@ -73,6 +75,19 @@ function Blogs() {
       setCategories(data);
     } catch (error) {
       console.error('Error fetching categories:', error.message);
+    }
+  };
+
+  const fetchAuthors = async () => {
+    try {
+      const response = await fetch('/api/authors');
+      if (!response.ok) {
+        throw new Error('Failed to fetch authors');
+      }
+      const data = await response.json();
+      setAuthors(data);
+    } catch (error) {
+      console.error('Error fetching authors:', error.message);
     }
   };
 
@@ -92,7 +107,7 @@ function Blogs() {
   };
 
   const handleSubmit = async () => {
-    if (!title || !quillContent || !metaDescription || !metaTitle || !description || !selectedCategory || !selectedLanguage) {
+    if (!title || !quillContent || !metaDescription || !metaTitle || !description || !selectedCategory || !selectedLanguage || !selectedAuthor) {
       setError('Please fill in all the fields.');
       return;
     }
@@ -111,7 +126,7 @@ function Blogs() {
       if (imageFile) {
         formData.append('image', imageFile); // Use the image file
       }
-      formData.append('author', username);
+      formData.append('author', selectedAuthor); // Use the selected author
       formData.append('slug', slug);
       formData.append('createdAt', new Date().toISOString());
       formData.append('isDraft', JSON.stringify(false));
@@ -282,6 +297,20 @@ function Blogs() {
                 <option value="ru">Русский</option>
                 <option value="es">Español</option>
                 <option value="de">Deutsch</option>
+              </select>
+            </div>
+            <div className="mb-6">
+              <label htmlFor="author" className="block mb-2 text-lg font-medium">Author*</label>
+              <select
+                id="author"
+                value={selectedAuthor}
+                onChange={(e) => setSelectedAuthor(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg p-3 shadow-sm"
+              >
+                <option value="" disabled>Select an author</option>
+                {authors.map((author) => (
+                  <option key={author._id} value={author.name}>{author.name}</option>
+                ))}
               </select>
             </div>
             <div className="mb-3">
