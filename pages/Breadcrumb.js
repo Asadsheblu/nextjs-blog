@@ -1,9 +1,11 @@
 import Link from 'next/link';
 
 const Breadcrumb = ({ categoryName, blogTitle }) => {
-  
   // Function to convert category name to a slug
   const generateSlug = (name) => {
+    if (!name) {
+      return 'unknown-category'; // Fallback slug if name is undefined or null
+    }
     return name
       .toLowerCase() // Convert to lowercase
       .replace(/ /g, '-') // Replace spaces with hyphens
@@ -22,7 +24,7 @@ const Breadcrumb = ({ categoryName, blogTitle }) => {
         </li>
         <li className="breadcrumb-item">
           <Link href={`/categories/${categorySlug}`}>
-            <span className="text-blue-500 hover:underline whitespace-nowrap"> / {categoryName}</span>
+            <span className="text-blue-500 hover:underline whitespace-nowrap"> / {categoryName || 'Unknown Category'}</span>
           </Link>
         </li>
         {blogTitle && (
