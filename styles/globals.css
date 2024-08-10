@@ -274,87 +274,6 @@ blockquote {
   font-family: 'Playfair Display', serif;
 }
 
-/* Centered container for various elements */
-.center {
-  margin: auto;
-  width: 50%;
-  padding: 10px;
-}
-
-/* Keywords input styling */
-.keywords-input {
-  border: 2px solid #ccc;
-  padding: 10px;
-  border-radius: 5px;
-  display: flex;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  min-height: 48px;
-  width: 300px;
-}
-
-.keywords-input input {
-  flex: 1;
-  border: none;
-  height: 46px;
-  font-size: 14px;
-  padding: 4px 8px;
-}
-
-.keywords-input .tag {
-  width: auto;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  padding: 0 8px;
-  font-size: 14px;
-  list-style: none;
-  border-radius: 6px;
-  background-color: #007BFF;
-  margin-right: 8px;
-  margin-bottom: 8px;
-}
-
-.keywords-input input:focus {
-  outline: none;
-}
-
-.keywords-input .tag .remove-btn {
-  display: inline-block;
-  margin-left: 8px;
-  cursor: pointer;
-}
-
-/* Styling for forms within YouTube */
-.youtube-form {
-  width: 80%;
-  margin: 20px auto;
-  font-family: Arial, sans-serif;
-}
-
-.form-section {
-  margin-bottom: 20px;
-}
-
-.form-section label {
-  display: block;
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-
-.form-section input,
-.form-section textarea {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.form-section textarea {
-  height: 100px;
-}
 
 /* Social media icons specific colors */
 .facebook-icon {
@@ -381,78 +300,6 @@ blockquote {
 
 
 
-/* Tag container styles */
-.tag-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  padding: 10px;
-}
-
-.tag {
-  display: flex;
-  align-items: center;
-  background-color: #eee;
-  border-radius: 20px;
-  padding: 5px 10px;
-  font-size: 14px;
-  color: #333;
-}
-
-.tag:hover {
-  background-color: #ddd;
-  /* Darker on hover */
-}
-
-.close-icon {
-  display: inline-block;
-  margin-left: 10px;
-  cursor: pointer;
-  color: #666;
-}
-
-.close-icon:hover {
-  color: #333;
-  /* Darker color on hover */
-}
-
-.extract {
-  cursor: pointer;
-}
-
-.generated-titles-container {
-  margin-top: 20px;
-  background: #f8f8f8;
-  padding: 10px;
-  border-radius: 5px;
-}
-
-.select-all-checkbox,
-.title-checkbox {
-  display: flex;
-  align-items: center;
-  margin-bottom: 10px;
-  padding: 5px;
-  background: white;
-  border: 1px solid #ddd;
-}
-
-.select-all-checkbox span,
-.title-checkbox span {
-  margin-left: 8px;
-}
-
-.copy-icon {
-  margin-left: 10px;
-  cursor: pointer;
-  color: #007bff;
-}
-
-.alert-warning {
-  color: #856404;
-  background-color: #fff3cd;
-  border-color: #ffeeba;
-}
 
 .btn-danger {
   background-color: red;
@@ -466,7 +313,9 @@ blockquote {
   text-decoration: none;
   transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out;
 }
-
+.zindex{
+  z-index: 100;
+}
 .nav-pills .nav-link.active,
 .nav-pills .show>.nav-link {
   color: #fff;
@@ -694,4 +543,19 @@ tbody{
 .breadcrumb-item + .breadcrumb-item::before {
   content: "";
   margin-right: 0.5rem;
+}
+
+
+.blog-img{
+  width: 100%;
+  height: 270px!important;
+
+}
+
+.comment-content {
+  white-space: normal; /* Ensure text wraps */
+  word-wrap: break-word; /* Ensure long words break */
+  overflow-wrap: break-word; /* Ensure text doesn't overflow */
+  word-break: break-all; /* Break long words if necessary */
+  max-width: 100%; /* Prevent content from overflowing the container */
 }

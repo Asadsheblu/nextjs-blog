@@ -88,21 +88,17 @@ function Navbar() {
 
   const navigation = [
     { key: 'Home', href: '/', dropdown: false },
-    ...categories.slice(0, 3).map((category) => ({
+    ...categories.slice(0, 4).map((category) => ({
       key: category.name,
       href: `/categories/${category.slug}`,
       dropdown: false,
     })),
     { key: 'About Us', href: '/about', dropdown: false },
-    { key: 'Contact Us', href: '/contact', dropdown: false },
-    ...(isLoggedIn ? [{ key: 'Dashboard', href: '/dashbaord/dashbaord', dropdown: false }] : []),
+    
+  
   ];
 
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    setIsLoggedIn(false);
-    router.push('/login');
-  };
+
 
   return (
     <>
@@ -154,7 +150,7 @@ function Navbar() {
                         leaveFrom="opacity-100 scale-100"
                         leaveTo="opacity-0 scale-95"
                       >
-                        <Menu.Items className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+                        <Menu.Items className="origin-top-right absolute right-0 mt-2 zindex w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
                           <div className="py-1">
                             {availableLanguages.map(lang => (
                               <Menu.Item key={lang.code}>
@@ -175,22 +171,14 @@ function Navbar() {
                     </Menu>
                   </div>
 
-                  {isLoggedIn ? (
-                    <>
+               
                       <button
-                        onClick={handleLogout}
+                       
                         className="text-gray-300 bg-red-700 hover:text-red-500 hover:bg-gray-700 px-3 py-2 ml-4 rounded-md text-sm font-medium"
                       >
-                        {t('Logout')}
+                      <Link className='text-white' href="/contact">  {t('Contact Us')}</Link>
                       </button>
-                    </>
-                  ) : (
-                    <Link href="/login">
-                      <button className="text-gray-300 bg-red-700 hover:text-red-500 hover:bg-gray-700 px-3 py-2 rounded-md text-sm font-medium">
-                        {t('Login')}
-                      </button>
-                    </Link>
-                  )}
+                 
                 </div>
               </div>
             </div>

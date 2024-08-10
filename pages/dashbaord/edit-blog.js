@@ -326,7 +326,7 @@ function EditBlog() {
                 <Image src={URL.createObjectURL(image)} alt="Preview" width={300} height={200} className="w-full h-auto rounded-lg shadow-md" />
               </div>
             )}
-            <p className="text-gray-600 text-sm mt-1">Valid image type: jpg/jpeg/png/svg</p>
+            <p className="text-gray-600 text-sm mt-1">Valid image size: 400 * 270 px </p>
           </div>
           <div className="mb-3 col-span-2">
             <label htmlFor="content" className="block mb-2 text-lg font-medium">Content*</label>

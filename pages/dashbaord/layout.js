@@ -15,6 +15,8 @@ import {
   FaInfo,
   FaFile,
   FaUserAlt,
+  FaInfoCircle,
+  FaLock,
 } from 'react-icons/fa';
 import { FaDownLeftAndUpRightToCenter } from 'react-icons/fa6';
 
@@ -33,8 +35,19 @@ const Layout = ({ children }) => {
     ) {
       setContentManagementOpen(true);
     }
+    if (
+      router.pathname === '/dashbaord/about' ||
+      router.pathname === '/dashbaord/privacy'||
+      router.pathname === '/dashbaord/terms'||
+      router.pathname === '/dashbaord/notice'
+    ) {
+      setImportantManagementOpen(true);
+    }
    
   }, [router.pathname]);
+  const toggleimportantManagement = () => {
+    setImportantManagementOpen(!importantManagementOpen);
+  };
 
   const isActiveRoute = (route) => {
     return router.pathname === route;
@@ -131,7 +144,68 @@ const Layout = ({ children }) => {
               </div>
             )}
           </div>
-        
+          <div>
+              <div
+                onClick={toggleimportantManagement}
+                className={`flex items-center mt-4 py-2 px-6 cursor-pointer rounded-md ${
+                  importantManagementOpen
+                    ? 'bg-gray-300 text-gray-700'
+                    : 'text-gray-600 hover:bg-gray-200 hover:text-gray-700'
+                }`}
+              >
+                <FaInfo className="mr-3 text-red-500" /> <span className="mx-3">Important Page</span>
+                <span className="ml-auto">{importantManagementOpen ? <FaChevronDown /> : <FaChevronRight />}</span>
+              </div>
+              {importantManagementOpen && (
+                <div className="ml-6">
+                  <Link href="/dashbaord/about" passHref>
+                    <p
+                      className={`flex items-center mt-2 py-2 px-6 cursor-pointer rounded-md ${
+                        isActiveRoute('/dashbaord/about')
+                          ? 'bg-gray-300 text-gray-700'
+                          : 'text-gray-600 hover:bg-gray-200 hover:text-gray-700'
+                      }`}
+                    >
+                      <FaInfoCircle className="mr-3" /> <span className="mx-3">About</span>
+                    </p>
+                  </Link>
+                  <Link href="/dashbaord/privacy" passHref>
+                    <p
+                      className={`flex items-center mt-2 py-2 px-6 cursor-pointer rounded-md ${
+                        isActiveRoute('/dashbaord/privacy')
+                          ? 'bg-gray-300 text-gray-700'
+                          : 'text-gray-600 hover:bg-gray-200 hover:text-gray-700'
+                      }`}
+                    >
+                      <FaLock className="mr-3" /> <span className="mx-3">Privacy</span>
+                    </p>
+                  </Link>
+                  <Link href="/dashbaord/terms" passHref>
+                    <p
+                      className={`flex items-center mt-2 py-2 px-6 cursor-pointer rounded-md ${
+                        isActiveRoute('/dashbaord/terms')
+                          ? 'bg-gray-300 text-gray-700'
+                          : 'text-gray-600 hover:bg-gray-200 hover:text-gray-700'
+                      }`}
+                    >
+                      <FaKey className="mr-3" /> <span className="mx-3">Terms</span>
+                    </p>
+                  </Link>
+                  <Link href="/dashbaord/notice" passHref>
+                    <p
+                      className={`flex items-center mt-2 py-2 px-6 cursor-pointer rounded-md ${
+                        isActiveRoute('/dashbaord/notice')
+                          ? 'bg-gray-300 text-gray-700'
+                          : 'text-gray-600 hover:bg-gray-200 hover:text-gray-700'
+                      }`}
+                    >
+                      <FaBell className="mr-3" /> <span className="mx-3">Notice</span>
+                    </p>
+                  </Link>
+                </div>
+              )}
+              
+            </div>
       
           <Link href="/dashbaord/comment" passHref>
             <p

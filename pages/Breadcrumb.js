@@ -1,6 +1,17 @@
 import Link from 'next/link';
 
-const Breadcrumb = ({ categorySlug, categoryName, blogTitle }) => {
+const Breadcrumb = ({ categoryName, blogTitle }) => {
+  
+  // Function to convert category name to a slug
+  const generateSlug = (name) => {
+    return name
+      .toLowerCase() // Convert to lowercase
+      .replace(/ /g, '-') // Replace spaces with hyphens
+      .replace(/[^\w-]+/g, ''); // Remove all non-word characters except hyphens
+  };
+
+  const categorySlug = generateSlug(categoryName);
+
   return (
     <nav aria-label="breadcrumb">
       <ol className="breadcrumb flex items-center text-sm md:text-base lg:text-lg">

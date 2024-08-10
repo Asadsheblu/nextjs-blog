@@ -18,6 +18,7 @@ import {
   LinkedinIcon
 } from 'react-share';
 import { FaFacebook, FaTwitter, FaLinkedin } from 'react-icons/fa';
+import Image from 'next/image';
 
 const getTitle = (translation) => translation.title || translation.Title || '';
 const getContent = (translation) => translation.content || translation.Content || '';
@@ -32,7 +33,7 @@ const insertTocBeforeFirstHeading = (content, tocHtml) => {
   return `${beforeFirstHeading}${tocHtml}${afterFirstHeading}`;
 };
 
-const BlogPost = ({ initialBlog, initialAuthor }) => {
+const BlogPost = ({ initialBlog, initialAuthor,relatedBlogs}) => {
   const router = useRouter();
   const { slug } = router.query;
   const { locale } = router;
@@ -263,6 +264,49 @@ const BlogPost = ({ initialBlog, initialAuthor }) => {
   </div>
 </div>
 
+            {/* Related Blogs Section */}
+            <div className="">
+              <h2 className="text-2xl font-bold mb-4">Related Blogs</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4">
+                {relatedBlogs.map((relatedBlog, index) => {
+                  const relatedTranslation = relatedBlog.translations[locale];
+                  console.log(relatedTranslation);
+                  
+                  return (
+                    <div key={index} className="bg-gray-100 rounded-lg shadow hover:shadow-md transition-shadow">
+                     
+                      <div className=' h-[270px] rounded' >
+          
+            <Image
+              src={relatedTranslation?.image}
+              alt={getTitle(content)}
+              width={400}
+              height={270}
+              className='blog-img rounded'
+              quality={50} // Image quality reduced
+            />
+       
+        </div>
+                      <div className='p-4'>
+                      {/* <div className="absolute top-2 left-2 bg-blue-500 text-white text-sm rounded-full px-2 py-1">
+                        <span className="mr-2">{content?.category}</span>
+                      </div> */}
+                   
+                      <h3 className="text-xl font-semibold mb-2">
+                        <a href={`/blog/${relatedTranslation.slug}`} className="text-blue-600 hover:underline">
+                          {relatedTranslation.title}
+                        </a>
+                      </h3>
+                      <p className="text-gray-600 mb-2">{relatedTranslation.description?.substring(0, 100)}...</p>
+                      <a href={`/blog/${relatedTranslation.slug}`} className="text-blue-500 hover:underline">
+                        Read More
+                      </a>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
             <Comments slug={slug} />
           </div>
         </div>
@@ -270,7 +314,6 @@ const BlogPost = ({ initialBlog, initialAuthor }) => {
     </div>
   );
 };
-
 export async function getServerSideProps({ locale, params, req }) {
   try {
     const { slug } = params;
@@ -296,10 +339,16 @@ export async function getServerSideProps({ locale, params, req }) {
     const authors = authorResponse.data;
     const author = authors.find(author => author.name === blog.author);
 
+    // Fetch related blogs from the same category
+    const categoryBlogs = blogs.filter(
+      b => b !== blog && Object.values(b.translations).some(translation => translation.category === blog.translations[locale]?.category)
+    ).slice(0, 3); // Limiting to 3 related blogs
+
     return {
       props: {
         initialBlog: blog,
         initialAuthor: author || null,
+        relatedBlogs: categoryBlogs,
         ...(await serverSideTranslations(locale, ['common', 'navbar', 'footer'])),
       },
     };
@@ -310,5 +359,6 @@ export async function getServerSideProps({ locale, params, req }) {
     };
   }
 }
+
 
 export default BlogPost;

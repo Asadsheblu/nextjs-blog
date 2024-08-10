@@ -326,7 +326,7 @@ function Blogs() {
                   <Image src={image} alt="Preview" width={100} height={100} className="rounded-lg shadow-md" />
                 </div>
               )}
-              <p className="text-gray-600 text-sm mt-1">Valid image type: jpg/jpeg/png/svg</p>
+              <p className="text-gray-600 text-sm mt-1">Valid image size: 400 * 270 px </p>
             </div>
             <button
               className="bg-blue-500 text-white p-3 rounded-lg w-full mb-4 shadow-md"

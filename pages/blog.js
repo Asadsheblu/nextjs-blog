@@ -176,14 +176,13 @@ const BlogSection = ({ initialBlogs = [] }) => {
               return (
                 <div key={index} className="bg-white shadow-md rounded-lg overflow-hidden relative">
                   {content?.image && (
-                    <div className="w-full relative">
+                    <div className="w-full" style={{ height: '260px'}}>
                       <Image
                         src={content.image}
                         alt={content.title}
                         width={400}
-                        height={300}
-                        layout="responsive"
-                        objectFit="cover"
+                        height={260}
+                      className='blog-img'
                         quality={50} // Image quality reduced
                       />
                       <div className="absolute top-2 left-2 bg-blue-500 text-white text-sm rounded-full px-2 py-1">
@@ -191,7 +190,7 @@ const BlogSection = ({ initialBlogs = [] }) => {
                       </div>
                     </div>
                   )}
-                  <div className="border-t ps-3 pe-3 pt-2 d-flex">
+                  <div className="border-t ps-3 pe-3 pt-3 d-flex">
                     <p className="text-sm text-gray-500">
                       <FaUserCircle className="text-center fs-6 text-red-400 inline" /> {blog.author}
                     </p>
@@ -228,7 +227,7 @@ const BlogSection = ({ initialBlogs = [] }) => {
               return (
                 <div key={index} className="bg-white shadow-md rounded-lg overflow-hidden flex flex-col md:flex-row relative">
                   {content?.image && (
-                    <div className="w-full md:mt-2 md:w-5/12" style={{ height: '140px', position: 'relative' }}>
+                    <div className="w-full  md:w-5/12" style={{ height: '165px', position: 'relative' }}>
                       <Image
                         src={content.image}
                         alt={content.title}
@@ -328,56 +327,59 @@ const BlogSection = ({ initialBlogs = [] }) => {
   </ul>
 </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
-            {currentBlogs.slice(0, 9).map((blog, index) => {
-              const content = blog.translations[currentLanguage];
-              return (
-                <div key={index} className="bg-white shadow-md rounded-lg overflow-hidden relative">
-                  {content.image && (
-                    <Image
-                      src={content.image}
-                      alt={getTitle(content)}
-                      width={300}
-                      height={200}
-                      layout="responsive"
-                      className="object-cover rounded-lg"
-                      quality={50} // Image quality reduced
-                    />
-                  )}
-                  <div className="absolute top-2 left-2 bg-blue-500 text-white text-sm rounded-full px-2 py-1">
-                    <span className="mr-2">{content?.category}</span>
-                  </div>
-                  <div className="border-t ps-4 pe-4 pt-2 d-flex">
-                    <p className="text-sm text-gray-500">
-                      <FaUserCircle className="text-center fs-6 text-red-400 inline" /> {blog.author}
-                    </p>
-                    <p className="text-sm text-gray-500 ms-auto">
-                      <FaCalendar className="text-center text-red-400 inline" />
-                      {format(new Date(blog.createdAt), 'dd/MM/yyyy')}
-                    </p>
-                  </div>
-                  <div className="p-4">
-                    <h4 className="text-lg font-semibold">
-                      <Link href={`/blog/${content.slug}`} passHref>
-                        <span className="text-blue-500 hover:underline">{getTitle(content)}</span>
-                      </Link>
-                    </h4>
-                    <p className="text-gray-500 text-sm">{content?.description}</p>
-                    <div className="mt-2">
-                      {parseCategories(blog.category).map((category, i) => (
-                        <span key={i} className="text-sm bg-gray-200 text-gray-700 rounded-full px-2 py-1 mr-2">
-                          {category}
-                        </span>
-                      ))}
-                    </div>
-                    <Link href={`/blog/${content.slug}`} passHref>
-                      <span className="text-red-500 mt-4 block">Read More →</span>
-                    </Link>
-                  </div>
-                </div>
-              );
-            })}
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
+  {currentBlogs.slice(0, 9).map((blog, index) => {
+    const content = blog.translations[currentLanguage];
+    return (
+      <div key={index} className="bg-white shadow-md rounded-lg overflow-hidden relative">
+        <div className='w-[400px] h-[270px]'>
+          {content.image && (
+            <Image
+              src={content.image}
+              alt={getTitle(content)}
+              width={400}
+              height={270}
+              className='blog-img'
+              quality={50} // Image quality reduced
+            />
+          )}
+        </div>
+        <div className="absolute top-2 left-2 bg-blue-500 text-white text-sm rounded-full px-2 py-1">
+          <span className="mr-2">{content?.category}</span>
+        </div>
+        <div className="border-t ps-4 pe-4 pt-2 d-flex">
+          <p className="text-sm text-gray-500">
+            <FaUserCircle className="text-center fs-6 text-red-400 inline" /> {blog.author}
+          </p>
+          <p className="text-sm text-gray-500 ms-auto">
+            <FaCalendar className="text-center text-red-400 inline" />
+            {format(new Date(blog.createdAt), 'dd/MM/yyyy')}
+          </p>
+        </div>
+        <div className="p-4">
+          <h4 className="text-lg font-semibold">
+            <Link href={`/blog/${content.slug}`} passHref>
+              <span className="text-blue-500 hover:underline">{getTitle(content)}</span>
+            </Link>
+          </h4>
+          <p className="text-gray-500 text-sm">{content?.description}</p>
+          <div className="mt-2">
+            {parseCategories(blog.category).map((category, i) => (
+              <span key={i} className="text-sm bg-gray-200 text-gray-700 rounded-full px-2 py-1 mr-2">
+                {category}
+              </span>
+            ))}
           </div>
+          <Link href={`/blog/${content.slug}`} passHref>
+            <span className="text-red-500 mt-4 block">Read More →</span>
+          </Link>
+        </div>
+      </div>
+    );
+  })}
+</div>
+
+
         </div>
 
         <div className="flex justify-center mt-8">
