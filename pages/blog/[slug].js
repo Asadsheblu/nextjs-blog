@@ -231,33 +231,38 @@ const BlogPost = ({ initialBlog, initialAuthor }) => {
               </div>
             </div>
             <div className="p-6 mb-3 bg-blue-50 md:w-full rounded-lg shadow-md">
-              <h2 className="text-2xl font-bold mb-4">About The Author</h2>
-              <hr/>
-              <div className="flex items-center">
-                <img src={author?.image} alt={author?.name} className="w-40 h-40 rounded-full mr-4" />
-                <div>
-                  <h3 className="text-xl font-bold pt-3">{author?.name}</h3>
-                  <p className="text-gray-700">{author?.bio}</p>
-                  <div className="flex mt-2 space-x-4">
-                    {author?.socialLinks?.facebook && (
-                      <a href={author.socialLinks.facebook} target="_blank" rel="noopener noreferrer">
-                        <FaFacebook size={24} />
-                      </a>
-                    )}
-                    {author?.socialLinks?.twitter && (
-                      <a href={author.socialLinks.twitter} target="_blank" rel="noopener noreferrer">
-                        <FaTwitter size={24} />
-                      </a>
-                    )}
-                    {author?.socialLinks?.linkedin && (
-                      <a href={author.socialLinks.linkedin} target="_blank" rel="noopener noreferrer">
-                        <FaLinkedin size={24} />
-                      </a>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
+  <h2 className="text-2xl font-bold mb-4">About The Author</h2>
+  <hr/>
+  <div className="flex items-center">
+    <img 
+      src={author?.image} 
+      alt={author?.name ? `Profile picture of ${author.name}` : 'Author image'} 
+      className="w-40 h-40 rounded-full mr-4" 
+    />
+    <div>
+      <h3 className="text-xl font-bold pt-3">{author?.name}</h3>
+      <p className="text-gray-700">{author?.bio}</p>
+      <div className="flex mt-2 space-x-4">
+        {author?.socialLinks?.facebook && (
+          <a href={author.socialLinks.facebook} target="_blank" rel="noopener noreferrer">
+            <FaFacebook size={24} />
+          </a>
+        )}
+        {author?.socialLinks?.twitter && (
+          <a href={author.socialLinks.twitter} target="_blank" rel="noopener noreferrer">
+            <FaTwitter size={24} />
+          </a>
+        )}
+        {author?.socialLinks?.linkedin && (
+          <a href={author.socialLinks.linkedin} target="_blank" rel="noopener noreferrer">
+            <FaLinkedin size={24} />
+          </a>
+        )}
+      </div>
+    </div>
+  </div>
+</div>
+
             <Comments slug={slug} />
           </div>
         </div>

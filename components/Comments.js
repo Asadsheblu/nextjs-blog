@@ -54,6 +54,7 @@ const Comment = ({ comment, slug, onReply }) => {
                 placeholder="Write a reply..."
                 className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
                 rows="2"
+                required
               />
               <button
                 type="submit"

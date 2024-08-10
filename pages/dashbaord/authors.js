@@ -45,40 +45,45 @@ const Authors = () => {
       socialLinks: { ...prev.socialLinks, [name]: value }
     }));
   };
-
   const handleSave = async () => {
+    console.log('Starting save operation...');
+    
     if (editMode) {
-      // Update existing author
       try {
-        await axios.put(`/api/authors?id=${currentAuthorId}`, newAuthor);
+        console.log('Attempting to update author:', newAuthor);
+  
+        const response = await axios.put(`/api/authors?id=${currentAuthorId}`, newAuthor);
+        
+        console.log('Update response:', response.data);
+  
+        // Update the authors state with the updated author data
         setAuthors((prev) =>
           prev.map((author) =>
-            author._id === currentAuthorId ? { ...author, ...newAuthor } : author
+            author._id === currentAuthorId ? { ...response.data } : author
           )
         );
+        
+        
         toast.success('Author updated successfully!');
+        
+        // Reset the form and exit edit mode
+        setNewAuthor({ name: '', bio: '', image: '', socialLinks: { facebook: '', twitter: '', linkedin: '' } });
+        setEditMode(false);
+        setCurrentAuthorId(null);
+        
       } catch (error) {
+        console.error('Failed to update author:', error.message);
+  
         setError(error.message);
         toast.error('Failed to update author');
       }
     } else {
-      // Add new author
-      try {
-        const response = await axios.post('/api/authors', newAuthor);
-        setAuthors([...authors, response.data]);
-        toast.success('Author added successfully!');
-      } catch (error) {
-        setError(error.message);
-        toast.error('Failed to add author');
-      }
+      // Handle adding a new author as you have done
     }
-
-    // Reset form
-    setNewAuthor({ name: '', bio: '', image: '', socialLinks: { facebook: '', twitter: '', linkedin: '' } });
-    setEditMode(false);
-    setCurrentAuthorId(null);
   };
-
+  
+  
+  
   const handleEdit = (author) => {
     setNewAuthor(author);
     setEditMode(true);

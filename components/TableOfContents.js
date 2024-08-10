@@ -40,7 +40,7 @@ const TableOfContents = ({ headings }) => {
   };
 
   return (
-    <div className="table-of-contents border mt-5 pb-5 pt-5 px-4 rounded-lg shadow" style={{ backgroundColor: '#f8f8f9' }}>
+    <div className="table-of-contents border mt-5 pb-5 pt-5 px-4 rounded-lg shadow" style={{ backgroundColor: '#e1e1e1' }}>
       <div
         className="toc-header flex justify-between items-center cursor-pointer"
         onClick={toggleToc}
