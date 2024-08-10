@@ -20,20 +20,6 @@ const Breadcrumb = ({ categorySlug, categoryName, blogTitle }) => {
           </li>
         )}
       </ol>
-      <style>{`
-        .breadcrumb {
-          list-style: none;
-          padding: 0;
-          white-space: nowrap; /* Ensure the breadcrumb items stay in one line */
-        }
-        .breadcrumb-item {
-          margin-right: 0.5rem;
-        }
-        .breadcrumb-item + .breadcrumb-item::before {
-          content: "";
-          margin-right: 0.5rem;
-        }
-      `}</style>
     </nav>
   );
 };

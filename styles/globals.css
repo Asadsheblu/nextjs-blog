@@ -32,7 +32,6 @@ body {
 }
 
 
-
 /* / Headings / */
 h1, h2, h3, h4, h5, h6 {
   color: #222;
@@ -42,32 +41,32 @@ h1, h2, h3, h4, h5, h6 {
 
 h1 {
   font-size: 2.5em;
-  line-height: 1.2;
+  
 }
 
 h2 {
-  font-size: 2em;
-  line-height: 1.3;
+  font-size: 24px
+  
 }
 
 h3 {
   font-size: 1.75em;
-  line-height: 1.4;
+  
 }
 
 h4 {
   font-size: 1.5em;
-  line-height: 1.5;
+  
 }
 
 h5 {
   font-size: 1.25em;
-  line-height: 1.6;
+  
 }
 
 h6 {
   font-size: 1em;
-  line-height: 1.7;
+  
 }
 
 /* / Text Formatting / */
@@ -99,12 +98,6 @@ ul, ol {
 
 li {
   margin: 0.5em 0;
-}
-
-@media (max-width: 600px) {
-  .tags-container {
-    flex-direction: column;
-  }
 }
 
 /* / Code Blocks / */
@@ -274,27 +267,6 @@ blockquote {
   th, td {
     padding: 0.3em;
   }
-}
-
-
-
-/* / Media Queries for Responsiveness / */
-@media (max-width: 768px) {
-    body {
-        font-size: 14px;
-    }
-
-    h1 {
-        font-size: 2em;
-    }
-
-    h2 {
-        font-size: 1.75em;
-    }
-
-    h3 {
-        font-size: 1.5em;
-    }
 }
 
 /* Styling for headlines using Playfair Display font */
@@ -610,7 +582,7 @@ tbody{
   overflow-x: scroll;
 }
 .table-of-contents {
-  margin-bottom: 20px;
+  border: 1px solid #cfccd5;;
 }
 
 .toc-header {
@@ -619,12 +591,10 @@ tbody{
   justify-content: space-between;
   align-items: center;
   padding: 10px;
-  background: #f1f1f1;
   border-radius: 5px;
 }
 
 .toc-list {
-  background: rgb(241, 241, 241); /* Set background color for TOC content */
   padding: 10px;
   border-radius: 5px;
 }
@@ -709,4 +679,19 @@ tbody{
   top: -80px;
 
 }
+}
+
+.breadcrumb {
+  list-style: none;
+  padding: 0;
+  white-space: nowrap; /* Ensure the breadcrumb items stay in one line */
+}
+
+.breadcrumb-item {
+  margin-right: 0.5rem;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+  content: "";
+  margin-right: 0.5rem;
 }

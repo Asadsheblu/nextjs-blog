@@ -24,9 +24,9 @@ const AuthorBio = ({ authorName }) => {
   if (!author) return null;
 
   return (
-    <div className="flex items-center p-4 border rounded-lg shadow-md bg-white">
+    <div className="flex items-center w-100 p-4 border rounded-lg shadow-md bg-white">
       <div className="flex-shrink-0 mr-4">
-        <img src={author.image} alt={author.name} className="w-16 h-16 rounded-full" />
+        <img src={author.image} alt={author.name} className="w-40 h-40 rounded-full" />
       </div>
       <div>
         <h3 className="text-lg font-semibold">

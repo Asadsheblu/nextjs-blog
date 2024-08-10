@@ -230,11 +230,11 @@ const BlogPost = ({ initialBlog, initialAuthor }) => {
                 </div>
               </div>
             </div>
-            <div className="p-6 mb-3 bg-blue-50 md:w-2/5 rounded-lg shadow-md">
+            <div className="p-6 mb-3 bg-blue-50 md:w-full rounded-lg shadow-md">
               <h2 className="text-2xl font-bold mb-4">About The Author</h2>
               <hr/>
               <div className="flex items-center">
-                <img src={author?.image} alt={author?.name} className="w-16 h-16 rounded-full mr-4" />
+                <img src={author?.image} alt={author?.name} className="w-40 h-40 rounded-full mr-4" />
                 <div>
                   <h3 className="text-xl font-bold pt-3">{author?.name}</h3>
                   <p className="text-gray-700">{author?.bio}</p>

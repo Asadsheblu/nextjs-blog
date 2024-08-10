@@ -1,7 +1,8 @@
 import { connectToDatabase } from "../../utils/mongodb";
+import { ObjectId } from 'mongodb';
 
 export default async function handler(req, res) {
-  const { method, query } = req;
+  const { method, query, body } = req;
   const { db } = await connectToDatabase();
   const collection = db.collection('authors');
 

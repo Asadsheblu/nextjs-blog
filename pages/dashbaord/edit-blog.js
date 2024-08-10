@@ -11,7 +11,7 @@ const QuillWrapper = dynamic(() => import('../../components/EditorWrapper'), { s
 function EditBlog() {
   const router = useRouter();
   const { id } = router.query;
-
+  const [slug, setSlug] = useState('');
   const [quillContent, setQuillContent] = useState('');
   const [error, setError] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -26,6 +26,7 @@ function EditBlog() {
   const [initialImage, setInitialImage] = useState(null);
   const [authors, setAuthors] = useState([]); // Authors list
   const [selectedAuthor, setSelectedAuthor] = useState(''); // Selected author
+  const [isSlugEditable, setIsSlugEditable] = useState(false); // Track if slug is editable
 
   useEffect(() => {
     fetchCategories();
@@ -74,15 +75,25 @@ function EditBlog() {
         setSelectedCategory(translation.category);
         setTitle(translation.title);
         setMetaTitle(translation.metaTitle);
+        setSlug(translation?.slug);
         setMetaDescription(translation.metaDescription);
         setDescription(translation.description);
         setInitialImage(translation.image);
         setSelectedAuthor(data.author); // Set the selected author
+
+        // Auto-select feature image logic
+        if (!translation.image) {
+          const firstImageMatch = translation.content.match(/<img[^>]+src="?([^"\s]+)"?\s*\/>/);
+          if (firstImageMatch && firstImageMatch[1]) {
+            setInitialImage(firstImageMatch[1]);
+          }
+        }
       } else {
         // Clear the form if the translation for the selected language does not exist
         setQuillContent('');
         setSelectedCategory('');
         setTitle('');
+        setSlug('');
         setMetaTitle('');
         setMetaDescription('');
         setDescription('');
@@ -102,22 +113,20 @@ function EditBlog() {
       const formData = new FormData();
       formData.append('content', quillContent);
       formData.append('title', title);
+      formData.append('slug', slug);  // Use the slug from state
       formData.append('metaTitle', metaTitle);
       formData.append('metaDescription', metaDescription);
       formData.append('description', description);
       if (image) {
         formData.append('image', image);
+      } else if (initialImage) {
+        formData.append('image', initialImage);
       }
       formData.append('category', selectedCategory);
       formData.append('author', selectedAuthor); // Set selected author
-      formData.append('authorProfile', ''); // No author profile
       formData.append('createdAt', new Date().toISOString());
       formData.append('isDraft', JSON.stringify(isDraft));
       formData.append('language', language); // Append language
-
-      // Generate slug from title
-      const slug = title.toLowerCase().split(' ').join('-');
-      formData.append('slug', slug); // Append slug
 
       const response = await fetch(`/api/blogs?id=${id}`, {
         method,
@@ -136,7 +145,7 @@ function EditBlog() {
       console.error('Error updating content:', error.message);
       setError(error.message);
     }
-  }, [quillContent, selectedCategory, metaTitle, metaDescription, description, title, image, isDraft, id, router, language, selectedAuthor]);
+  }, [quillContent, selectedCategory, metaTitle, metaDescription, description, title, slug, image, initialImage, isDraft, id, router, language, selectedAuthor]);
 
   const handleQuillChange = useCallback((newContent) => {
     setQuillContent(newContent);
@@ -163,6 +172,10 @@ function EditBlog() {
 
   const handleAuthorChange = (e) => {
     setSelectedAuthor(e.target.value);
+  };
+
+  const toggleSlugEditable = () => {
+    setIsSlugEditable(!isSlugEditable);
   };
 
   return (
@@ -256,10 +269,20 @@ function EditBlog() {
             <input
               id="slug"
               type="text"
-              value={title.toLowerCase().split(' ').join('-')}
-              readOnly
+              value={slug}
+              onChange={(e) => setSlug(e.target.value)}
               className="w-full border border-gray-300 rounded-lg p-3 bg-gray-100 shadow-sm"
+              disabled={!isSlugEditable} // Disable editing unless the checkbox is checked
             />
+            <div className="mt-2">
+              <input
+                type="checkbox"
+                id="editSlug"
+                checked={isSlugEditable}
+                onChange={toggleSlugEditable}
+              />
+              <label htmlFor="editSlug" className="ml-2 cursor-pointer text-blue-600 hover:underline">Edit Slug</label>
+            </div>
           </div>
           <div className="mb-3">
             <label htmlFor="description" className="block mb-2 text-lg font-medium">Description*</label>

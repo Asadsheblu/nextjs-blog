@@ -243,6 +243,7 @@ const handlePutRequest = async (req, res, blogs, query) => {
         [`translations.${language}.category`]: updatedData.category,
         [`translations.${language}.image`]: updatedData.image,
         [`translations.${language}.slug`]: updatedData.slug,
+        author: updatedData.author,
       },
     };
 

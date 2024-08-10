@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { ClipLoader } from 'react-spinners';
-import { FaCalendar, FaUserCircle } from 'react-icons/fa';
+import { FaCalendar, FaSearch, FaUserCircle } from 'react-icons/fa';
 import { i18n } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { format } from 'date-fns';
@@ -27,7 +27,6 @@ const extractFirstImage = (content) => {
   return match ? match[1] : null;
 };
 
-// Helper function to get the correct title and content
 const getTitle = (translation) => translation.title || translation.Title || '';
 const getContent = (translation) => translation.content || translation.Content || '';
 
@@ -40,19 +39,19 @@ const BlogSection = ({ initialBlogs = [] }) => {
   const [blogsData, setBlogsData] = useState(initialBlogs);
   const blogsPerPage = 9;
   const currentLanguage = i18n.language || 'en';
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentCategory, setCurrentCategory] = useState(selectedCategory || '');
 
-  const filteredBlogs = useMemo(() => {
+  const processedBlogs = useMemo(() => {
     return blogsData.map(blog => {
       const lang = blog.defaultLanguage || 'en';
       let translation = blog.translations[lang] || blog.translations['en'] || {};
 
-      // If the blog doesn't have a slug, generate it from the title
       const title = getTitle(translation);
       if (!translation.slug && title) {
         translation.slug = createSlug(title);
       }
 
-      // If the blog doesn't have an image, use the first image from the content
       const content = getContent(translation);
       if (!translation.image && content) {
         translation.image = extractFirstImage(content);
@@ -63,29 +62,34 @@ const BlogSection = ({ initialBlogs = [] }) => {
         translations: {
           ...blog.translations,
           [lang]: translation,
-          // Ensure there is a translation entry for the current language
           [currentLanguage]: blog.translations[currentLanguage] || translation,
         },
       };
     }).filter(blog => blog.translations[currentLanguage]);
   }, [blogsData, currentLanguage]);
 
+  const latestBlogs = processedBlogs.slice(0, 4);
+
   const categoryBlogs = useMemo(() => {
-    if (!selectedCategory) {
-      return filteredBlogs;
+    let blogs = processedBlogs.slice(0); 
+    if (currentCategory) {
+      blogs = blogs.filter(blog =>
+        blog.translations[currentLanguage].category.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '') === currentCategory
+      );
     }
-    return filteredBlogs.filter(blog =>
-      blog.translations[currentLanguage].category.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '') === selectedCategory
-    );
-  }, [selectedCategory, filteredBlogs, currentLanguage]);
+    if (searchQuery) {
+      blogs = blogs.filter(blog => getTitle(blog.translations[currentLanguage]).toLowerCase().includes(searchQuery.toLowerCase()));
+    }
+    return blogs;
+  }, [currentCategory, processedBlogs, currentLanguage, searchQuery]);
 
   const currentBlogs = useMemo(() => {
-    return filteredBlogs.slice((currentPage - 1) * blogsPerPage, currentPage * blogsPerPage);
-  }, [filteredBlogs, currentPage, blogsPerPage]);
+    return categoryBlogs.slice((currentPage - 1) * blogsPerPage, currentPage * blogsPerPage);
+  }, [categoryBlogs, currentPage, blogsPerPage]);
 
   const totalPages = useMemo(() => {
-    return Math.ceil(filteredBlogs.length / blogsPerPage);
-  }, [filteredBlogs.length, blogsPerPage]);
+    return Math.ceil(categoryBlogs.length / blogsPerPage);
+  }, [categoryBlogs.length, blogsPerPage]);
 
   const fetchBlogs = useCallback(async () => {
     setLoading(true);
@@ -108,6 +112,15 @@ const BlogSection = ({ initialBlogs = [] }) => {
     }
   }, [fetchBlogs, initialBlogs]);
 
+  const handleCategoryChange = (categorySlug) => {
+    setCurrentCategory(categorySlug);
+    setCurrentPage(1);
+    router.push({
+      pathname: router.pathname,
+      query: { category: categorySlug },
+    }, undefined, { shallow: true });
+  };
+
   const parseCategories = (category) => {
     return category ? category.split(',') : [];
   };
@@ -115,14 +128,13 @@ const BlogSection = ({ initialBlogs = [] }) => {
   const createCategorySlug = (category) => {
     return category
       .toLowerCase()
-      .replace(/\s+/g, '-') // Replace spaces with -
-      .replace(/[^\w-]+/g, ''); // Remove all non-word characters
+      .replace(/\s+/g, '-') 
+      .replace(/[^\w-]+/g, ''); 
   };
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  // Create a Set to remove duplicate categories
-  const categoriesSet = new Set(filteredBlogs.map(blog => blog.translations[currentLanguage].category));
+  const categoriesSet = new Set(processedBlogs.map(blog => blog.translations[currentLanguage].category));
   const uniqueCategories = Array.from(categoriesSet);
 
   if (loading) {
@@ -137,7 +149,7 @@ const BlogSection = ({ initialBlogs = [] }) => {
     return <p className="text-red-500 text-center">{error}</p>;
   }
 
-  if (filteredBlogs.length === 0) {
+  if (processedBlogs.length === 0) {
     return <p>No blogs available in this language.</p>;
   }
 
@@ -151,16 +163,15 @@ const BlogSection = ({ initialBlogs = [] }) => {
         content="Enhance your YouTube experience with our comprehensive suite of tools designed for creators and viewers alike. Extract video summaries, titles, descriptions, and more. Boost your channel's performance with advanced features and insights"
       />
 
-      <PromoSection /> {/* Add the new promo section here */}
+      <PromoSection />
 
       <div className="max-w-7xl container">
-        {/* Latest Blogs Section */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mt-8">
           <div className="col-span-12">
             <h2 className="text-2xl text-blue-900 font-bold mb-2">Latest Blog</h2>
           </div>
           <div className="col-span-12 md:col-span-5">
-            {currentBlogs.slice(0, 1).map((blog, index) => {
+            {latestBlogs.slice(0, 1).map((blog, index) => {
               const content = blog.translations[currentLanguage];
               return (
                 <div key={index} className="bg-white shadow-md rounded-lg overflow-hidden relative">
@@ -168,11 +179,12 @@ const BlogSection = ({ initialBlogs = [] }) => {
                     <div className="w-full relative">
                       <Image
                         src={content.image}
-                        alt={getTitle(content)}
+                        alt={content.title}
                         width={400}
                         height={300}
                         layout="responsive"
                         objectFit="cover"
+                        quality={50} // Image quality reduced
                       />
                       <div className="absolute top-2 left-2 bg-blue-500 text-white text-sm rounded-full px-2 py-1">
                         <span className="mr-2">{content?.category}</span>
@@ -191,7 +203,7 @@ const BlogSection = ({ initialBlogs = [] }) => {
                   <div className="p-3">
                     <h6 className="text-lg font-semibold">
                       <Link href={`/blog/${content.slug}`} passHref>
-                        <span className="text-blue-500 hover:underline">{getTitle(content)}</span>
+                        <span className="text-blue-500 hover:underline">{content.title}</span>
                       </Link>
                     </h6>
                     <p className="text-gray-600 mb-4">{content.description || content.Description}</p>
@@ -211,7 +223,7 @@ const BlogSection = ({ initialBlogs = [] }) => {
             })}
           </div>
           <div className="col-span-12 md:col-span-7 space-y-4">
-            {currentBlogs.slice(1, 4).map((blog, index) => {
+            {latestBlogs.slice(1, 4).map((blog, index) => {
               const content = blog.translations[currentLanguage];
               return (
                 <div key={index} className="bg-white shadow-md rounded-lg overflow-hidden flex flex-col md:flex-row relative">
@@ -219,10 +231,11 @@ const BlogSection = ({ initialBlogs = [] }) => {
                     <div className="w-full md:mt-2 md:w-5/12" style={{ height: '140px', position: 'relative' }}>
                       <Image
                         src={content.image}
-                        alt={getTitle(content)}
+                        alt={content.title}
                         layout="fill"
                         objectFit="cover"
-                        className='rounded'
+                        className="rounded"
+                        quality={50} // Image quality reduced
                       />
                       <div className="absolute top-2 left-2 bg-blue-500 text-white text-sm rounded-full px-2 py-1">
                         <span className="mr-2">{content?.category}</span>
@@ -232,7 +245,7 @@ const BlogSection = ({ initialBlogs = [] }) => {
                   <div className="ps-2 pt-2 flex-1 md:w-7/12">
                     <h6 className="text-lg font-semibold">
                       <Link href={`/blog/${content.slug}`} passHref>
-                        <span className="text-blue-500 hover:underline">{getTitle(content)}</span>
+                        <span className="text-blue-500 hover:underline">{content.title}</span>
                       </Link>
                     </h6>
                     <Link href={`/blog/${content.slug}`} passHref>
@@ -247,7 +260,6 @@ const BlogSection = ({ initialBlogs = [] }) => {
                         {format(new Date(blog.createdAt), 'dd/MM/yyyy')}
                       </p>
                     </div>
-                  
                   </div>
                 </div>
               );
@@ -255,48 +267,69 @@ const BlogSection = ({ initialBlogs = [] }) => {
           </div>
         </div>
         <div className="bg-[#f7f3ff] bg py-8 pt-5 pb-5 px-5 md:px-10 flex items-center justify-center rounded-lg shadow-md my-10">
-      <div className="max-w-5xl w-full grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-        <div className="col-span-12 md:col-span-5 text-center md:text-left">
-          <h2 className="text-2xl md:text-3xl font-semibold text-gray-800">Subscribe to our newsletter.</h2>
-          <p className="text-gray-600 mt-2">Join 80,000 others!</p>
-        </div>
-        <div className="col-span-12 md:col-span-7">
-          <form className="flex flex-col items-center md:flex-row w-full">
-            <input
-              type="email"
-              placeholder="Email Address"
-              className="w-full md:flex-1 p-3 rounded-l-md border border-gray-300 focus:outline-none"
-            />
-            <button type="submit" className="bg-purple-700 text-white p-3 rounded-r-md">
-              Sign Up
-            </button>
-          </form>
-          <p className="text-gray-600 text-xs mt-3 md:mt-1 text-center md:text-left">
-            By signing up, you agree to our <Link href="/privacy-policy"><span className="text-purple-600">Privacy Policy</span></Link>
-          </p>
-        </div>
-      </div>
-    </div>
-
-        <div className="text-white  rounded-lg relative w-full mt-5 mb-5">
-          <div className="mb-4">
-            <ul className="flex flex-wrap space-x-2 bg-blue-900 text-white px-4 py-2 rounded-lg overflow-auto">
-              <li className={`px-3 py-2 list-none rounded-md text-sm font-medium ${!selectedCategory ? 'bg-blue-700' : ''}`}>
-                <Link className='text-white' href="/">Latest Blog</Link>
-              </li>
-              {uniqueCategories.map((category) => {
-                const slug = createCategorySlug(category);
-                return (
-                  <li key={slug} className={`px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700 ${selectedCategory === slug ? 'bg-blue-700' : ''}`}>
-                    <Link className='text-white' href={`/?category=${slug}`}>{category}</Link>
-                  </li>
-                );
-              })}
-            </ul>
+          <div className="max-w-5xl w-full grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+            <div className="col-span-12 md:col-span-5 text-center md:text-left">
+              <h2 className="text-2xl md:text-3xl font-semibold text-gray-800">Subscribe to our newsletter.</h2>
+              <p className="text-gray-600 mt-2">Join 80,000 others!</p>
+            </div>
+            <div className="col-span-12 md:col-span-7">
+              <form className="flex flex-col items-center md:flex-row w-full">
+                <input
+                  type="email"
+                  placeholder="Email Address"
+                  className="w-full md:flex-1 p-3 rounded-l-md border border-gray-300 focus:outline-none"
+                />
+                <button type="submit" className="bg-purple-700 text-white p-3 rounded-r-md">
+                  Sign Up
+                </button>
+              </form>
+              <p className="text-gray-600 text-xs mt-3 md:mt-1 text-center md:text-left">
+                By signing up, you agree to our <Link href="/privacy-policy"><span className="text-purple-600">Privacy Policy</span></Link>
+              </p>
+            </div>
           </div>
-         
+        </div>
+
+        <div className="flex justify-center mb-6">
+          <div className="relative w-full max-w-lg">
+            <input
+              type="text"
+              placeholder="Search blogs by title..."
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <FaSearch className="absolute top-3 right-3 text-gray-400" />
+          </div>
+        </div>
+
+        <div className="text-white rounded-lg relative w-full mt-5 mb-5">
+        
+<div className="flex justify-center mb-4">
+  <ul className="flex flex-wrap justify-center space-x-2">
+    <li
+      className={`px-4 py-2 list-none rounded-full text-sm font-medium border ${!currentCategory ? 'bg-purple-700 text-white' : 'bg-white text-gray-700'}`}
+      onClick={() => handleCategoryChange('')}
+    >
+      <span className="cursor-pointer">All Posts</span>
+    </li>
+    {uniqueCategories.map((category) => {
+      const slug = createCategorySlug(category);
+      return (
+        <li
+          key={slug}
+          className={`px-4 py-2 list-none rounded-full text-sm font-medium border ${currentCategory === slug ? 'bg-purple-700 text-white' : 'bg-white text-gray-700'}`}
+          onClick={() => handleCategoryChange(slug)}
+        >
+          <span className="cursor-pointer">{category}</span>
+        </li>
+      );
+    })}
+  </ul>
+</div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
-            {categoryBlogs.slice(0, 9).map((blog, index) => {
+            {currentBlogs.slice(0, 9).map((blog, index) => {
               const content = blog.translations[currentLanguage];
               return (
                 <div key={index} className="bg-white shadow-md rounded-lg overflow-hidden relative">
@@ -308,6 +341,7 @@ const BlogSection = ({ initialBlogs = [] }) => {
                       height={200}
                       layout="responsive"
                       className="object-cover rounded-lg"
+                      quality={50} // Image quality reduced
                     />
                   )}
                   <div className="absolute top-2 left-2 bg-blue-500 text-white text-sm rounded-full px-2 py-1">
