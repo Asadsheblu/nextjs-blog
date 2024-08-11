@@ -18,7 +18,7 @@ const AuthorPosts = () => {
     try {
       const capitalizedRole = capitalizeFirstLetter(role); // Capitalize role
   
-      console.log(`Fetching author with name: ${name} and role: ${capitalizedRole}`);
+      // console.log(`Fetching author with name: ${name} and role: ${capitalizedRole}`);
       
       const authorResponse = await axios.get(`/api/authors`, {
         params: {
@@ -28,7 +28,7 @@ const AuthorPosts = () => {
       });
   
       // Check if the response is as expected
-      console.log('Author API Response:', authorResponse.data);
+      // console.log('Author API Response:', authorResponse.data);
   
       if (authorResponse.status === 200 && authorResponse.data.length > 0) {
         setAuthorInfo(authorResponse.data[0]);

@@ -31,7 +31,7 @@ const AuthorCard = ({ name, role, image }) => {
 
 const AuthorInfo = ({ data }) => {
   if (!data) return null;
-console.log(data);
+
 
   return (
     <div className="mt-5 mb-5 flex-col space-y-6 md:flex-row md:space-y-0 md:space-x-6 bg-white rounded-lg ps-5 pe-5 pt-2 pb-2 grid grid-cols-1 md:grid-cols-3 gap-6">

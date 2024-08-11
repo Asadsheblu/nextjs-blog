@@ -349,13 +349,13 @@ export async function getServerSideProps({ locale, params, req }) {
 
     // Filter authors based on roles
     const author = authors.find(author => author.role === 'Author' && author.name === blog.author);
-    console.log(author);
+
     
     const editor = authors.find(author => author.role === 'Editor' && author.name === blog.editor);
-    console.log(editor);
+
     
     const developer = authors.find(author => author.role === 'Developer' && author.name === blog.developer);
-console.log(developer);
+
 
     // Fetch related blogs from the same category
     const categoryBlogs = blogs.filter(

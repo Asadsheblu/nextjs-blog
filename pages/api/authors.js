@@ -17,16 +17,16 @@ export default async function handler(req, res) {
   case 'GET':
       try {
         const { name, role } = query;
-        console.log(`Received Query Params - Name: ${name}, Role: ${role}`);
+        // console.log(`Received Query Params - Name: ${name}, Role: ${role}`);
   
         const filter = {};
         if (name) filter.name = name;
         if (role) filter.role = role;
   
-        console.log(`Database Filter:`, filter);
+        // console.log(`Database Filter:`, filter);
   
         const authors = await collection.find(filter).toArray();
-        console.log('Authors Found:', authors);
+        // console.log('Authors Found:', authors);
   
         if (authors.length === 0) {
           return res.status(404).json({ success: false, message: 'Author not found' });
