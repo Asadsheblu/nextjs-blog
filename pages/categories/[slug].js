@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { FaCalendar, FaUserCircle } from 'react-icons/fa';
 import Image from 'next/image';
 import Link from 'next/link';
+import { ClipLoader } from 'react-spinners';
 
 const CategoryPage = () => {
   const router = useRouter();
@@ -10,7 +11,7 @@ const CategoryPage = () => {
   const [category, setCategory] = useState(null);
   const [blogs, setBlogs] = useState([]);
   const [error, setError] = useState(null);
-
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     if (slug) {
       fetchCategory();
@@ -18,6 +19,7 @@ const CategoryPage = () => {
   }, [slug]);
 
   const fetchCategory = async () => {
+    setLoading(true);
     try {
       const response = await fetch(`/api/categories/${slug}`);
       if (!response.ok) {
@@ -33,7 +35,9 @@ const CategoryPage = () => {
   };
 
   if (!category) {
-    return <div>Loading...</div>;
+    return <div className="flex justify-center items-center h-screen">
+    <ClipLoader size={50} color={"#123abc"} loading={loading} />
+  </div>
   }
 
   return (
