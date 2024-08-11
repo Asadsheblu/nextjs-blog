@@ -9,6 +9,7 @@ import Comments from '../../components/Comments';
 import { useToc } from '../../hook/useToc';
 import TableOfContents from '../../components/TableOfContents';
 import ReactDOMServer from 'react-dom/server';
+import { format } from 'date-fns';
 import {
   FacebookShareButton,
   TwitterShareButton,
@@ -19,6 +20,7 @@ import {
 } from 'react-share';
 import { FaFacebook, FaTwitter, FaLinkedin } from 'react-icons/fa';
 import Image from 'next/image';
+import AuthorInfo from '../../components/AuthorCard';
 
 const getTitle = (translation) => translation.title || translation.Title || '';
 const getContent = (translation) => translation.content || translation.Content || '';
@@ -33,12 +35,13 @@ const insertTocBeforeFirstHeading = (content, tocHtml) => {
   return `${beforeFirstHeading}${tocHtml}${afterFirstHeading}`;
 };
 
-const BlogPost = ({ initialBlog, initialAuthor,relatedBlogs}) => {
+const BlogPost = ({ initialBlog, authorData,relatedBlogs}) => {
   const router = useRouter();
   const { slug } = router.query;
   const { locale } = router;
   const [blog, setBlog] = useState(initialBlog);
-  const [author, setAuthor] = useState(initialAuthor);
+  const [author, setAuthor] = useState(authorData?.author);
+  const [editor, setEditor] = useState(authorData?.editor);
   const [loading, setLoading] = useState(!initialBlog);
   const [schemaData, setSchemaData] = useState(null);
   const [breadcrumbSchema, setBreadcrumbSchema] = useState(null);
@@ -211,9 +214,12 @@ const BlogPost = ({ initialBlog, initialAuthor,relatedBlogs}) => {
         <div className="flex flex-col lg:flex-row">
           <div className="flex-grow order-1 lg:order-2">
             <Breadcrumb categoryName={categoryName} blogTitle={title} />
+            <h1 className="md:text-5xl font-bold mb-4">{title}</h1>
+            <h6>Updated on {format(new Date(blog.createdAt), 'MMMM dd, yyyy')}</h6> {/* Updated format */}
+            <AuthorInfo data={authorData}/>
             <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-8">
               <div className="p-6 bg-white border-b border-gray-200">
-                <h1 className="text-3xl font-bold mb-4">{title}</h1>
+              
                 <div className="my-4" dangerouslySetInnerHTML={{ __html: contentWithToc }} />
                 <div className="my-8">
                   <h3 className="text-lg font-bold mb-4">Share this post</h3>
@@ -314,6 +320,8 @@ const BlogPost = ({ initialBlog, initialAuthor,relatedBlogs}) => {
     </div>
   );
 };
+
+
 export async function getServerSideProps({ locale, params, req }) {
   try {
     const { slug } = params;
@@ -322,9 +330,9 @@ export async function getServerSideProps({ locale, params, req }) {
     const apiUrl = `${protocol}://${host}/api/blogs`;
 
     const { data } = await axios.get(apiUrl);
-
     const blogs = data;
 
+    // Find the blog based on the slug
     const blog = blogs.find(blog =>
       Object.values(blog.translations).some(translation => translation.slug === slug)
     );
@@ -335,9 +343,19 @@ export async function getServerSideProps({ locale, params, req }) {
       };
     }
 
+    // Fetch authors and filter based on roles
     const authorResponse = await axios.get(`${protocol}://${host}/api/authors`);
     const authors = authorResponse.data;
-    const author = authors.find(author => author.name === blog.author);
+
+    // Filter authors based on roles
+    const author = authors.find(author => author.role === 'Author' && author.name === blog.author);
+    console.log(author);
+    
+    const editor = authors.find(author => author.role === 'Editor' && author.name === blog.editor);
+    console.log(editor);
+    
+    const developer = authors.find(author => author.role === 'Developer' && author.name === blog.developer);
+console.log(developer);
 
     // Fetch related blogs from the same category
     const categoryBlogs = blogs.filter(
@@ -347,18 +365,23 @@ export async function getServerSideProps({ locale, params, req }) {
     return {
       props: {
         initialBlog: blog,
-        initialAuthor: author || null,
+        authorData: {
+          author: author || null,
+          editor: editor || null,
+          developer: developer || null,
+        },
         relatedBlogs: categoryBlogs,
         ...(await serverSideTranslations(locale, ['common', 'navbar', 'footer'])),
       },
     };
   } catch (error) {
-    console.error('Error fetching blogs:', error.message);
+    console.error('Error fetching blogs or authors:', error.message);
     return {
       notFound: true,
     };
   }
 }
+
 
 
 export default BlogPost;

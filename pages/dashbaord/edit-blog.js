@@ -26,6 +26,8 @@ function EditBlog() {
   const [initialImage, setInitialImage] = useState(null);
   const [authors, setAuthors] = useState([]); // Authors list
   const [selectedAuthor, setSelectedAuthor] = useState(''); // Selected author
+  const [selectedEditor, setSelectedEditor] = useState(''); // Selected editor
+  const [selectedDeveloper, setSelectedDeveloper] = useState(''); // Selected developer
   const [isSlugEditable, setIsSlugEditable] = useState(false); // Track if slug is editable
 
   useEffect(() => {
@@ -80,6 +82,8 @@ function EditBlog() {
         setDescription(translation.description);
         setInitialImage(translation.image);
         setSelectedAuthor(data.author); // Set the selected author
+        setSelectedEditor(data.editor); // Set the selected editor
+        setSelectedDeveloper(data.developer); // Set the selected developer
 
         // Auto-select feature image logic
         if (!translation.image) {
@@ -98,6 +102,8 @@ function EditBlog() {
         setMetaDescription('');
         setDescription('');
         setSelectedAuthor(''); // Clear the selected author
+        setSelectedEditor(''); // Clear the selected editor
+        setSelectedDeveloper(''); // Clear the selected developer
       }
       setIsDraft(data.isDraft);
     } catch (error) {
@@ -124,6 +130,8 @@ function EditBlog() {
       }
       formData.append('category', selectedCategory);
       formData.append('author', selectedAuthor); // Set selected author
+      formData.append('editor', selectedEditor); // Set selected editor
+      formData.append('developer', selectedDeveloper); // Set selected developer
       formData.append('createdAt', new Date().toISOString());
       formData.append('isDraft', JSON.stringify(isDraft));
       formData.append('language', language); // Append language
@@ -145,7 +153,7 @@ function EditBlog() {
       console.error('Error updating content:', error.message);
       setError(error.message);
     }
-  }, [quillContent, selectedCategory, metaTitle, metaDescription, description, title, slug, image, initialImage, isDraft, id, router, language, selectedAuthor]);
+  }, [quillContent, selectedCategory, metaTitle, metaDescription, description, title, slug, image, initialImage, isDraft, id, router, language, selectedAuthor, selectedEditor, selectedDeveloper]);
 
   const handleQuillChange = useCallback((newContent) => {
     setQuillContent(newContent);
@@ -172,6 +180,14 @@ function EditBlog() {
 
   const handleAuthorChange = (e) => {
     setSelectedAuthor(e.target.value);
+  };
+
+  const handleEditorChange = (e) => {
+    setSelectedEditor(e.target.value);
+  };
+
+  const handleDeveloperChange = (e) => {
+    setSelectedDeveloper(e.target.value);
   };
 
   const toggleSlugEditable = () => {
@@ -303,9 +319,43 @@ function EditBlog() {
               className="w-full border border-gray-300 rounded-lg p-3 shadow-sm"
             >
               <option value="" disabled>Select an author</option>
-              {authors.map((author) => (
-                <option key={author._id} value={author.name}>{author.name}</option>
-              ))}
+              {authors
+                .filter((author) => author.role === 'Author')
+                .map((author) => (
+                  <option key={author._id} value={author.name}>{author.name}</option>
+                ))}
+            </select>
+          </div>
+          <div className="mb-3">
+            <label htmlFor="editor" className="block mb-2 text-lg font-medium">Editor*</label>
+            <select
+              id="editor"
+              value={selectedEditor}
+              onChange={handleEditorChange}
+              className="w-full border border-gray-300 rounded-lg p-3 shadow-sm"
+            >
+              <option value="" disabled>Select an editor</option>
+              {authors
+                .filter((author) => author.role === 'Editor')
+                .map((author) => (
+                  <option key={author._id} value={author.name}>{author.name}</option>
+                ))}
+            </select>
+          </div>
+          <div className="mb-3">
+            <label htmlFor="developer" className="block mb-2 text-lg font-medium">Developer*</label>
+            <select
+              id="developer"
+              value={selectedDeveloper}
+              onChange={handleDeveloperChange}
+              className="w-full border border-gray-300 rounded-lg p-3 shadow-sm"
+            >
+              <option value="" disabled>Select a developer</option>
+              {authors
+                .filter((author) => author.role === 'Developer')
+                .map((author) => (
+                  <option key={author._id} value={author.name}>{author.name}</option>
+                ))}
             </select>
           </div>
           <div className="mb-3">

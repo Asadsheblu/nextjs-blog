@@ -24,12 +24,12 @@ const Breadcrumb = ({ categoryName, blogTitle }) => {
         </li>
         <li className="breadcrumb-item">
           <Link href={`/categories/${categorySlug}`}>
-            <span className="text-blue-500 hover:underline whitespace-nowrap"> / {categoryName || 'Unknown Category'}</span>
+            <span className="text-blue-500 hover:underline whitespace-nowrap">{categoryName || 'Unknown Category'}</span>
           </Link>
         </li>
         {blogTitle && (
           <li className="breadcrumb-item active" aria-current="page">
-            <span className="text-gray-500 whitespace-nowrap"> / {blogTitle}</span>
+            <span className="text-gray-500 whitespace-nowrap">{blogTitle}</span>
           </li>
         )}
       </ol>

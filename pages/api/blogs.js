@@ -86,17 +86,39 @@ export default async function handler(req, res) {
   }
 }
 
-// Existing code...
 const handlePostRequest = async (req, res, blogs) => {
   try {
     await runMiddleware(req, res, upload.single('image'));
 
     const formData = req.body;
-    const { content, title, Title, metaTitle, description, slug, metaDescription, category, language, author, authorProfile } = formData;
+    const {
+      content,
+      title,
+      metaTitle,
+      description,
+      slug,
+      metaDescription,
+      category,
+      language,
+      author,
+      editor,
+      developer,
+    } = formData;
     const image = req.file ? `/uploads/${req.file.filename}` : null;
-    const finalTitle = title || Title;
 
-    if (!content || !finalTitle || !slug || !metaTitle || !description || !metaDescription || !category || !language || !author) {
+    if (
+      !content ||
+      !title ||
+      !slug ||
+      !metaTitle ||
+      !description ||
+      !metaDescription ||
+      !category ||
+      !language ||
+      !author ||
+      !editor ||
+      !developer
+    ) {
       return res.status(400).json({ message: 'Invalid request body' });
     }
 
@@ -105,7 +127,7 @@ const handlePostRequest = async (req, res, blogs) => {
     if (existingBlog) {
       const updateDoc = {
         $set: {
-          [`translations.${language}.title`]: finalTitle,
+          [`translations.${language}.title`]: title,
           [`translations.${language}.content`]: content,
           [`translations.${language}.metaTitle`]: metaTitle,
           [`translations.${language}.description`]: description,
@@ -114,7 +136,8 @@ const handlePostRequest = async (req, res, blogs) => {
           [`translations.${language}.image`]: image,
           [`translations.${language}.slug`]: slug,
           author,
-          authorProfile
+          editor,
+          developer,
         },
       };
 
@@ -133,7 +156,7 @@ const handlePostRequest = async (req, res, blogs) => {
         defaultLanguage: language,
         translations: {
           [language]: {
-            title: finalTitle,
+            title,
             content,
             metaTitle,
             description,
@@ -144,7 +167,8 @@ const handlePostRequest = async (req, res, blogs) => {
           },
         },
         author,
-        authorProfile,
+        editor,
+        developer,
         viewCount: 0,
         createdAt: new Date(),
       };
@@ -159,59 +183,6 @@ const handlePostRequest = async (req, res, blogs) => {
     }
   } catch (error) {
     console.error('POST error:', error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-};
-
-// Existing code...
-
-
-const handleGetRequest = async (req, res, blogs, query) => {
-  try {
-    if (query.id) {
-      const id = query.id;
-      const result = await blogs.findOne({ _id: new ObjectId(id) });
-
-      if (!result) {
-        return res.status(404).json({ message: 'Resource not found' });
-      }
-
-      res.status(200).json(result);
-    } else if (query.slug) {
-      const slug = query.slug;
-      const result = await blogs.findOne({ 'translations.slug': slug });
-
-      if (!result) {
-        return res.status(404).json({ message: 'Resource not found' });
-      }
-
-      res.status(200).json(result);
-    } else {
-      const blogsArray = await blogs.find({}).limit(15).toArray();
-      const updatedBlogsArray = blogsArray.map(blog => {
-        if (!blog.translations) {
-          blog.translations = {};
-        }
-        if (!blog.translations.en) {
-          const title = blog.title || blog.Title || '';
-          const content = blog.content || blog.Content || '';
-          blog.translations.en = {
-            title,
-            content,
-            metaTitle: blog.metaTitle || '',
-            description: blog.description || '',
-            metaDescription: blog.metaDescription || '',
-            category: blog.category || '',
-            image: blog.image || '',
-            slug: blog.slug || createSlug(title)
-          };
-        }
-        return blog;
-      });
-      res.status(200).json(updatedBlogsArray);
-    }
-  } catch (error) {
-    console.error('GET error:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 };
@@ -244,10 +215,10 @@ const handlePutRequest = async (req, res, blogs, query) => {
         [`translations.${language}.image`]: updatedData.image,
         [`translations.${language}.slug`]: updatedData.slug,
         author: updatedData.author,
+        editor: updatedData.editor,
+        developer: updatedData.developer,
       },
     };
-
-    console.log('Update Document:', updateDoc);
 
     const result = await blogs.updateOne(
       { _id: new ObjectId(id) },
@@ -264,6 +235,67 @@ const handlePutRequest = async (req, res, blogs, query) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+const handleGetRequest = async (req, res, blogs, query) => {
+  try {
+    if (query.id) {
+      const id = query.id;
+      const result = await blogs.findOne({ _id: new ObjectId(id) });
+
+      if (!result) {
+        return res.status(404).json({ message: 'Resource not found' });
+      }
+
+      res.status(200).json(result);
+    } else if (query.slug) {
+      const slug = query.slug;
+      const result = await blogs.findOne({ 'translations.slug': slug });
+
+      if (!result) {
+        return res.status(404).json({ message: 'Resource not found' });
+      }
+
+      res.status(200).json(result);
+    } else if (query.name && query.role) {
+      // Filtering based on author/editor/developer name
+      const filter = { [query.role]: query.name };
+      const filteredBlogs = await blogs.find(filter).toArray();
+
+      if (filteredBlogs.length === 0) {
+        return res.status(404).json({ message: 'No posts found for this person' });
+      }
+
+      res.status(200).json(filteredBlogs);
+    } else {
+      const blogsArray = await blogs.find({}).limit(15).toArray();
+      const updatedBlogsArray = blogsArray.map((blog) => {
+        if (!blog.translations) {
+          blog.translations = {};
+        }
+        if (!blog.translations.en) {
+          const title = blog.title || blog.Title || '';
+          const content = blog.content || blog.Content || '';
+          blog.translations.en = {
+            title,
+            content,
+            metaTitle: blog.metaTitle || '',
+            description: blog.description || '',
+            metaDescription: blog.metaDescription || '',
+            category: blog.category || '',
+            image: blog.image || '',
+            slug: blog.slug || createSlug(title),
+          };
+        }
+        return blog;
+      });
+      res.status(200).json(updatedBlogsArray);
+    }
+  } catch (error) {
+    console.error('GET error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
 
 const handleDeleteRequest = async (req, res, blogs, query) => {
   try {

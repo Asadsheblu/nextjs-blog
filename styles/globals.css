@@ -534,15 +534,16 @@ tbody{
   list-style: none;
   padding: 0;
   white-space: nowrap; /* Ensure the breadcrumb items stay in one line */
+  display: flex; /* Flexbox helps in aligning items tightly together */
 }
 
 .breadcrumb-item {
-  margin-right: 0.5rem;
+  margin-right: 0; /* Remove right margin to avoid extra space */
 }
 
 .breadcrumb-item + .breadcrumb-item::before {
-  content: "";
-  margin-right: 0.5rem;
+  content: "»";
+  margin: 0 0; /* Adjust margin for tighter space around the slash */
 }
 
 

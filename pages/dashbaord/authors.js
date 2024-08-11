@@ -11,6 +11,7 @@ const Authors = () => {
     name: '',
     bio: '',
     image: '',
+    role: 'Author', // Default role
     socialLinks: { facebook: '', twitter: '', linkedin: '' }
   });
   const [editMode, setEditMode] = useState(false);
@@ -45,45 +46,63 @@ const Authors = () => {
       socialLinks: { ...prev.socialLinks, [name]: value }
     }));
   };
+
   const handleSave = async () => {
     console.log('Starting save operation...');
-    
+
     if (editMode) {
       try {
         console.log('Attempting to update author:', newAuthor);
-  
+
         const response = await axios.put(`/api/authors?id=${currentAuthorId}`, newAuthor);
-        
+
         console.log('Update response:', response.data);
-  
+
         // Update the authors state with the updated author data
         setAuthors((prev) =>
           prev.map((author) =>
             author._id === currentAuthorId ? { ...response.data } : author
           )
         );
-        
-        
+
         toast.success('Author updated successfully!');
-        
+
         // Reset the form and exit edit mode
-        setNewAuthor({ name: '', bio: '', image: '', socialLinks: { facebook: '', twitter: '', linkedin: '' } });
+        setNewAuthor({ name: '', bio: '', image: '', role: 'Author', socialLinks: { facebook: '', twitter: '', linkedin: '' } });
         setEditMode(false);
         setCurrentAuthorId(null);
-        
+
       } catch (error) {
         console.error('Failed to update author:', error.message);
-  
+
         setError(error.message);
         toast.error('Failed to update author');
       }
     } else {
-      // Handle adding a new author as you have done
+      try {
+        console.log('Attempting to add a new author:', newAuthor);
+
+        const response = await axios.post('/api/authors', newAuthor);
+
+        console.log('Add response:', response.data);
+
+        // Add the new author to the authors state
+        setAuthors((prev) => [...prev, response.data]);
+
+        toast.success('Author added successfully!');
+
+        // Reset the form
+        setNewAuthor({ name: '', bio: '', image: '', role: 'Author', socialLinks: { facebook: '', twitter: '', linkedin: '' } });
+
+      } catch (error) {
+        console.error('Failed to add author:', error.message);
+
+        setError(error.message);
+        toast.error('Failed to add author');
+      }
     }
   };
-  
-  
-  
+
   const handleEdit = (author) => {
     setNewAuthor(author);
     setEditMode(true);
@@ -176,6 +195,19 @@ const Authors = () => {
                 className="border p-2 ms-2 md:w-2/3 rounded-md"
               />
             </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Role</label>
+              <select
+                name="role"
+                value={newAuthor.role}
+                onChange={handleChange}
+                className="border p-2 ms-2 md:w-2/3 rounded-md"
+              >
+                <option value="Author">Author</option>
+                <option value="Editor">Editor</option>
+                <option value="Developer">Developer</option>
+              </select>
+            </div>
           </div>
           <button onClick={handleSave} className="bg-blue-500 text-white py-2 px-4 rounded mt-4 hover:bg-blue-700">
             {editMode ? 'Update Author' : 'Add Author'}
@@ -189,23 +221,25 @@ const Authors = () => {
               <div>
                 <p className="font-semibold text-lg">{author.name}</p>
                 <p className="text-gray-600">{author.bio}</p>
+                <p className="text-gray-500">Role: {author.role}</p>
                 <div className="flex space-x-2 mt-2">
-                  {author.socialLinks.facebook && (
-                    <a href={author.socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                      <FaFacebook className="fs-3" />
-                    </a>
-                  )}
-                  {author.socialLinks.twitter && (
-                    <a href={author.socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">
-                      <FaTwitter className="fs-3" />
-                    </a>
-                  )}
-                  {author.socialLinks.linkedin && (
-                    <a href={author.socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="text-blue-700 hover:underline">
-                      <FaLinkedin className="fs-3" />
-                    </a>
-                  )}
-                </div>
+  {author.socialLinks && author.socialLinks.facebook && (
+    <a href={author.socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+      <FaFacebook className="fs-3" />
+    </a>
+  )}
+  {author.socialLinks && author.socialLinks.twitter && (
+    <a href={author.socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">
+      <FaTwitter className="fs-3" />
+    </a>
+  )}
+  {author.socialLinks && author.socialLinks.linkedin && (
+    <a href={author.socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="text-blue-700 hover:underline">
+      <FaLinkedin className="fs-3" />
+    </a>
+  )}
+</div>
+
                 <div className="flex space-x-4 mt-4">
                   <button
                     onClick={() => handleEdit(author)}

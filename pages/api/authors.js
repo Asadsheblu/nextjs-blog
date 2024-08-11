@@ -14,14 +14,32 @@ export default async function handler(req, res) {
   }
 
   switch (method) {
-    case 'GET':
+  case 'GET':
       try {
-        const authors = await collection.find({}).toArray();
+        const { name, role } = query;
+        console.log(`Received Query Params - Name: ${name}, Role: ${role}`);
+  
+        const filter = {};
+        if (name) filter.name = name;
+        if (role) filter.role = role;
+  
+        console.log(`Database Filter:`, filter);
+  
+        const authors = await collection.find(filter).toArray();
+        console.log('Authors Found:', authors);
+  
+        if (authors.length === 0) {
+          return res.status(404).json({ success: false, message: 'Author not found' });
+        }
+  
         return res.status(200).json(authors);
       } catch (error) {
         console.error('Failed to fetch authors:', error.message);
         return res.status(500).json({ success: false, message: 'Failed to fetch authors', error: error.message });
       }
+
+
+  
 
     case 'POST':
       try {

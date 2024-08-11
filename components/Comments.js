@@ -262,7 +262,7 @@ const Comments = ({ slug }) => {
   };
 
   return (
-    <div className="w-full max-w-full p-4">
+    <div className="w-full max-w-full pt-4 pb-4">
       <ToastContainer />
      <div className='border p-5 mb-5'>
      <h2 className="text-3xl font-bold mb-6">Leave Comments</h2>
@@ -280,7 +280,7 @@ const Comments = ({ slug }) => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Your email"
-          className="w-full md:w-1/2 p-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+          className="w-full md:w-1/2 me-2 p-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
           required
         />
         <textarea

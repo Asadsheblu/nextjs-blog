@@ -40,15 +40,13 @@ const TableOfContents = ({ headings }) => {
   };
 
   return (
-    <div className="table-of-contents border mt-5 pb-5 pt-5 px-4 rounded-lg shadow" style={{ backgroundColor: '#e1e1e1' }}>
+    <div className="table-of-contents border mt-5 pb-5 pt-5 px-4 mb-5 rounded-lg shadow" style={{ backgroundColor: '#e1e1e1' }}>
       <div
         className="toc-header flex justify-between items-center cursor-pointer"
         onClick={toggleToc}
       >
         <h2 className="text-lg font-semibold" style={headingStyles[2]}>Table of Contents</h2>
-        <div className="toc-toggle">
-          {isOpen ? <FaChevronUp size={20} /> : <FaChevronDown size={20} />}
-        </div>
+        
       </div>
       {isOpen && (
         <div className="toc-list mt-4">
