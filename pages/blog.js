@@ -199,10 +199,10 @@ const BlogSection = ({ initialBlogs = [] }) => {
                       {format(new Date(blog.createdAt), 'dd/MM/yyyy')}
                     </p>
                   </div>
-                  <div className="p-3">
+                  <div className="pe-3 ps-3 pt-2">
                     <h6 className="text-lg font-semibold">
                       <Link href={`/blog/${content.slug}`} passHref>
-                        <span className="text-blue-500 hover:underline">{content.title}</span>
+                        <span className="text-blue-500 text-xl font-bold hover:underline">{content.title}</span>
                       </Link>
                     </h6>
                     <p className="text-gray-600 mb-4">{content.description || content.Description}</p>
@@ -244,7 +244,7 @@ const BlogSection = ({ initialBlogs = [] }) => {
                   <div className="ps-2 pt-2 flex-1 md:w-7/12">
                     <h6 className="text-lg font-semibold">
                       <Link href={`/blog/${content.slug}`} passHref>
-                        <span className="text-blue-500 hover:underline">{content.title}</span>
+                        <span className="text-blue-500 text-xl font-bold hover:underline">{content.title}</span>
                       </Link>
                     </h6>
                     <Link href={`/blog/${content.slug}`} passHref>
@@ -359,7 +359,7 @@ const BlogSection = ({ initialBlogs = [] }) => {
         <div className="p-4">
           <h4 className="text-lg font-semibold">
             <Link href={`/blog/${content.slug}`} passHref>
-              <span className="text-blue-500 hover:underline">{getTitle(content)}</span>
+              <span className="text-blue-500 text-xl font-bold hover:underline">{getTitle(content)}</span>
             </Link>
           </h4>
           <p className="text-gray-500 text-sm">{content?.description}</p>

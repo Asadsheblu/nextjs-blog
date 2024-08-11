@@ -537,6 +537,7 @@ tbody{
   padding: 0;
   white-space: nowrap; /* Ensure the breadcrumb items stay in one line */
   display: flex; /* Flexbox helps in aligning items tightly together */
+  margin-left: 0!important;
 }
 
 .breadcrumb-item {

@@ -264,7 +264,7 @@ const Comments = ({ slug }) => {
   return (
     <div className="w-full max-w-full pt-4 pb-4">
       <ToastContainer />
-     <div className='border p-5 mb-5'>
+     <div className='border bg-white shadow-sm p-5 mb-5'>
      <h2 className="text-3xl font-bold mb-6">Leave Comments</h2>
       <form onSubmit={handleCommentSubmit} className="mb-6">
         <input

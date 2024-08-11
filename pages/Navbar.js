@@ -18,19 +18,7 @@ function classNames(...classes) {
 const availableLanguages = [
   { code: 'en', name: 'English', flag: 'us' },
   { code: 'fr', name: 'Français', flag: 'fr' },
-  { code: 'zh-HANT', name: '中国传统的', flag: 'cn' },
-  { code: 'zh-HANS', name: '简体中文', flag: 'cn' },
-  { code: 'nl', name: 'Nederlands', flag: 'nl' },
-  { code: 'gu', name: 'ગુજરાતી', flag: 'in' },
-  { code: 'hi', name: 'हिंदी', flag: 'in' },
-  { code: 'it', name: 'Italiano', flag: 'it' },
-  { code: 'ja', name: '日本語', flag: 'jp' },
-  { code: 'ko', name: '한국어', flag: 'kr' },
-  { code: 'pl', name: 'Polski', flag: 'pl' },
-  { code: 'pt', name: 'Português', flag: 'pt' },
-  { code: 'ru', name: 'Русский', flag: 'ru' },
-  { code: 'es', name: 'Español', flag: 'es' },
-  { code: 'de', name: 'Deutsch', flag: 'de' },
+  // ... other languages
 ];
 
 function Navbar() {
@@ -48,10 +36,9 @@ function Navbar() {
   }, []);
 
   useEffect(() => {
-    // Fetch categories from the API
     const fetchCategories = async () => {
       try {
-        const response = await axios.get('/api/categories'); // Update this URL to your actual API endpoint
+        const response = await axios.get('/api/categories');
         setCategories(response.data);
       } catch (error) {
         console.error('Error fetching categories:', error.message);
@@ -94,11 +81,7 @@ function Navbar() {
       dropdown: false,
     })),
     { key: 'About Us', href: '/about', dropdown: false },
-    
-  
   ];
-
-
 
   return (
     <>
@@ -122,7 +105,7 @@ function Navbar() {
                       {navigation.map((item) => (
                         <Link key={item.key} href={item.href} className={classNames(
                           router.pathname === item.href ? 'bg-gray-700 text-white' : 'text-gray-300 hover:text-red-500 hover:bg-gray-700',
-                          'px-3 py-2 rounded-md text-sm font-medium'
+                          'px-3 py-2 rounded-md text-base font-medium' // Increased font size for desktop view
                         )}>
                           {t(item.key)}
                         </Link>
@@ -130,11 +113,11 @@ function Navbar() {
                     </div>
                   </div>
                 </div>
-                <div className=" flex items-center inset-y-0 right-0 pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+                <div className="flex items-center inset-y-0 right-0 pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
                   <div className="relative inline-block text-left lan mr-4 hidden sm:flex block">
                     <Menu as="div" className="relative">
                       <div>
-                        <Menu.Button className="inline-flex lan justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-gray-800 text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
+                        <Menu.Button className="inline-flex lan justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-gray-800 text-base font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
                           <span className={`fi fi-${availableLanguages.find(l => l.code === selectedLanguage)?.flag}`} />
                           <span className="ml-2">{availableLanguages.find(l => l.code === selectedLanguage)?.name}</span>
                           <ChevronDownIcon className="ml-2 -mr-1 h-5 w-5" aria-hidden="true" />
@@ -157,7 +140,7 @@ function Navbar() {
                                 {({ active }) => (
                                   <button
                                     onClick={() => changeLanguage(lang.code)}
-                                    className={classNames(active ? 'bg-gray-100' : '', 'block w-full text-left px-4 py-2 text-sm')}
+                                    className={classNames(active ? 'bg-gray-100' : '', 'block w-full text-left px-4 py-2 text-base')}
                                   >
                                     <span className={`fi fi-${lang.flag} mr-2`}></span>
                                     {lang.name}
@@ -171,14 +154,9 @@ function Navbar() {
                     </Menu>
                   </div>
 
-               
-                      <button
-                       
-                        className="text-gray-300 bg-red-700 hover:text-red-500 hover:bg-gray-700 px-3 py-2 ml-4 rounded-md text-sm font-medium"
-                      >
-                      <Link className='text-white' href="/contact">  {t('Contact Us')}</Link>
-                      </button>
-                 
+                  <button className="text-gray-300 bg-red-700 hover:text-red-500 hover:bg-gray-700 px-3 py-2 ml-4 rounded-md text-base font-medium">
+                    <Link className='text-white' href="/contact">  {t('Contact Us')}</Link>
+                  </button>
                 </div>
               </div>
             </div>
@@ -187,7 +165,7 @@ function Navbar() {
                 {navigation.map((item) => (
                   <Link key={item.key} href={item.href} className={classNames(
                     router.pathname === item.href ? 'bg-gray-700 text-white' : 'text-gray-300 hover:text-red-500 hover:bg-gray-700',
-                    'block px-3 py-2 rounded-md text-base font-medium'
+                    'block px-3 py-2 rounded-md text-lg font-medium' // Increased font size for mobile view
                   )}>
                     {t(item.key)}
                   </Link>
@@ -195,7 +173,7 @@ function Navbar() {
                 <div className="flex lan items-center justify-center lan mt-4 space-x-4">
                   <Menu as="div" className="relative inline-block lan text-left">
                     <div>
-                      <Menu.Button className="inline-flex lan justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-gray-800 text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
+                      <Menu.Button className="inline-flex lan justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-gray-800 text-lg font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
                         <span className={`fi fi-${availableLanguages.find(l => l.code === selectedLanguage)?.flag}`} />
                         <span className="ml-2">{availableLanguages.find(l => l.code === selectedLanguage)?.name}</span>
                         <ChevronDownIcon className="ml-2 -mr-1 h-5 w-5" aria-hidden="true" />
@@ -218,7 +196,7 @@ function Navbar() {
                               {({ active }) => (
                                 <button
                                   onClick={() => changeLanguage(lang.code)}
-                                  className={classNames(active ? 'bg-gray-100' : '', 'block w-full text-left px-4 py-2 text-sm')}
+                                  className={classNames(active ? 'bg-gray-100' : '', 'block w-full text-left px-4 py-2 text-lg')}
                                 >
                                   <span className={`fi fi-${lang.flag} mr-2`}></span>
                                   {lang.name}

@@ -14,16 +14,16 @@ const AuthorCard = ({ name, role, image }) => {
       {image && (
         <img src={image} alt={name} className="w-12 h-12 rounded-full object-cover" />
       )}
-      <div className="text-center md:text-left pt-4">
+      <div className="md:text-left sm:text-center pt-4 ps-4">
         <small className="font-bold mb-1">
           {role === 'Author' ? 'Written by' : role === 'Editor' ? 'Edited by' : 'Developed by'}
         </small>
-        <p className="text-lg font-semibold mb-1">
-          <Link href={authorLink} className="text-blue-600 hover:underline">
+        <p className="text-base font-semibold mb-1">
+          <Link href={authorLink} className="text-black">
             {name}
           </Link>
         </p>
-        <p className="text-gray-600">{role}</p>
+        <p className="text-gray-600 text-base">{role}</p>
       </div>
     </div>
   );
