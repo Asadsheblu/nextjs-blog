@@ -18,7 +18,19 @@ function classNames(...classes) {
 const availableLanguages = [
   { code: 'en', name: 'English', flag: 'us' },
   { code: 'fr', name: 'Français', flag: 'fr' },
-  // ... other languages
+  { code: 'zh-HANT', name: '中国传统的', flag: 'cn' },
+  { code: 'zh-HANS', name: '简体中文', flag: 'cn' },
+  { code: 'nl', name: 'Nederlands', flag: 'nl' },
+  { code: 'gu', name: 'ગુજરાતી', flag: 'in' },
+  { code: 'hi', name: 'हिंदी', flag: 'in' },
+  { code: 'it', name: 'Italiano', flag: 'it' },
+  { code: 'ja', name: '日本語', flag: 'jp' },
+  { code: 'ko', name: '한국어', flag: 'kr' },
+  { code: 'pl', name: 'Polski', flag: 'pl' },
+  { code: 'pt', name: 'Português', flag: 'pt' },
+  { code: 'ru', name: 'Русский', flag: 'ru' },
+  { code: 'es', name: 'Español', flag: 'es' },
+  { code: 'de', name: 'Deutsch', flag: 'de' },
 ];
 
 function Navbar() {
