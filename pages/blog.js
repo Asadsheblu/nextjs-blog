@@ -381,23 +381,25 @@ const BlogSection = ({ initialBlogs = [] }) => {
 
 
         </div>
-
         <div className="flex justify-center mt-8">
-          <nav className="block">
-            <ul className="flex pl-0 rounded list-none flex-wrap">
-              {Array.from({ length: totalPages }, (_, index) => (
-                <li key={index} className="page-item">
-                  <button
-                    onClick={() => paginate(index + 1)}
-                    className={`page-link ${currentPage === index + 1 ? 'bg-blue-500 text-white' : 'bg-white text-blue-500'}`}
-                  >
-                    {index + 1}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </div>
+  {totalPages > 1 && ( // Only show pagination if there are more than one page
+    <nav className="block">
+      <ul className="flex pl-0 rounded list-none flex-wrap">
+        {Array.from({ length: totalPages }, (_, index) => (
+          <li key={index} className="page-item">
+            <button
+              onClick={() => paginate(index + 1)}
+              className={`page-link ${currentPage === index + 1 ? 'bg-blue-500 text-white' : 'bg-white text-blue-500'}`}
+            >
+              {index + 1}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )}
+</div>
+
       </div>
     </div>
   );
