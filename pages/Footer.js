@@ -1,29 +1,55 @@
 /* eslint-disable react/no-unescaped-entities */
 import Link from "next/link";
-import React from "react";
-import { FaCcMastercard, FaFacebook, FaInstagram, FaLinkedin, FaPaypal, FaStripe, FaTwitter } from "react-icons/fa";
-// import logo from "../public/yt icon.png";
+import React, { useEffect, useState } from "react";
+import { FaFacebook, FaInstagram, FaLinkedin, FaTwitter } from "react-icons/fa";
 import Image from "next/image";
 import { useTranslation } from "react-i18next";
-
+import axios from 'axios';
+import logo from "../public/yt icon.png"
 const Footer = () => {
-  const [t] = useTranslation('footer');
+  const [t, i18n] = useTranslation('footer');
+  const [blogData, setBlogData] = useState([]);
+
+  useEffect(() => {
+    // Fetch blog data from your API
+    const fetchBlogData = async () => {
+      try {
+        const response = await axios.get('/api/blogs'); // Update this URL to your actual API endpoint
+        const blogs = response.data;
+        const data = blogs.map(blog => {
+          const translation = blog.translations[i18n.language] || {};
+          return {
+            title: translation.title || blog.title || blog.Title,
+            slug: translation.slug || blog.slug
+          };
+        });
+        setBlogData(data);
+      } catch (error) {
+        console.error('Error fetching blog data:', error.message);
+      }
+    };
+
+    fetchBlogData();
+  }, [i18n.language]);
+
+  // Function to get random titles and slugs
+  const getRandomData = (data, num) => {
+    const shuffled = data.sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, num);
+  };
+
+  // Get random blog data to display
+  const randomData = getRandomData(blogData, 5);
 
   return (
     <div>
       <footer className="bg-gray-900 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-8">
-            {/* <!-- Solutions Column --> */}
+          
+            {/* Solutions Column */}
             <div>
-              {/* <Link href="/"> 
-                <Image 
-                  src={logo}
-                  alt="GFG logo served with static path of public directory"
-                  height="150"
-                  width="250"
-                /> 
-              </Link> */}
+            <Image src={logo} alt="logo" width={128} height={64}/>
               <p className="mt-5 text-gray-400">
                 {t('Welcome to Microters, your creative marketing partner. We turn vision into measurable success with innovative strategies and data-driven solutions.')}
               </p>
@@ -34,7 +60,7 @@ const Footer = () => {
                 <FaLinkedin className="fs-3 ms-2 hover:text-blue-900 transition duration-300 transform hover:scale-110" />
               </div>
             </div>
-            {/* <!-- Support Column --> */}
+            {/* Support Column */}
             <div>
               <h5 className="text-sm font-semibold uppercase text-white">
                 {t('Help & Support')}
@@ -72,48 +98,20 @@ const Footer = () => {
                 </li>
               </ul>
             </div>
-            {/* <!-- Company Column --> */}
+            {/* Tools Column */}
             <div>
-              <h5 className="text-sm font-semibold uppercase text-white">Our Tools</h5>
+              <h5 className="text-sm font-semibold uppercase text-white">Recent News</h5>
               <ul className="mt-4 space-y-2">
-                <li>
-                  <Link href="/tools/title-generator" className="text-gray-300 hover:text-white">
-                    {t('YouTube Title Generator')}
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/tools/tag-extractor" className="text-gray-300 hover:text-white">
-                    {t('YouTube Tag Extractor')}
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/tools/description-generator" className="text-gray-300 hover:text-white">
-                    {t('YouTube Description Generator')}
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/tools/youtube-title-and-description-extractor" className="text-gray-300 hover:text-white">
-                    {t('YouTube Title and Description Extractor')}
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/tools/youtube-thumbnail" className="text-gray-300 hover:text-white">
-                    {t('YouTube Thumbnails')}
-                  </Link>
-                </li>
-                <li>
-                  <Link href="tools/channel-id-finder" className="text-gray-300 hover:text-white">
-                    {t('YouTube Channel ID Finder')}
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/tools/video-data-viewer" className="text-gray-300 hover:text-white">
-                    {t('YouTube Video Data Viewer')}
-                  </Link>
-                </li>
+                {randomData.map((blog, index) => (
+                  <li key={index}>
+                    <Link href={`/blog/${blog.slug}`} className="text-gray-300 hover:text-white">
+                      {blog.title}
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </div>
-            {/* <!-- Payment Section --> */}
+            {/* Contact Column */}
             <div className="sm:col-span-2 md:col-span-4 lg:col-span-1">
               <h5 className="text-sm font-semibold uppercase text-white">
                 {t('Contact')}
@@ -140,24 +138,9 @@ const Footer = () => {
                   </button>
                 </div>
               </form>
-             
             </div>
           </div>
           <div className="border-t border-gray-700 pt-3">
-          <div className="">
-                <small className="uppercase flex justify-center  text-white mb-2">
-                  {t('We accept the following payment methods:')}
-                </small>
-               
-                <div className="flex justify-center  space-x-2">
-                  <FaPaypal className="fs-1 paypal-blue cursor-pointer" />
-                  <FaCcMastercard className="fs-1 mastercard-red cursor-pointer" />
-                  <FaStripe className="fs-1 stripe-blue cursor-pointer" />
-                </div>
-                <small className="text-gray-400 flex justify-center ">
-                  {t('All transactions are secure and encrypted.')}
-                </small>
-              </div>
             <p className="text-base text-gray-400 xl:text-center">
               {t('© 2024 Microters, Inc. All rights reserved.')}
             </p>

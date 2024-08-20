@@ -4,6 +4,6 @@ module.exports = {
   reactStrictMode: true,
   i18n,
   images: {
-    domains: ['learnmethods.com'], // Add your allowed domains here
+    domains: ['learnmethods.com','doppcall.com','localhost'], // Add your allowed domains here
   },
 };

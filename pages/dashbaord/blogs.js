@@ -21,13 +21,15 @@ function Blogs() {
   const [image, setImage] = useState(null);
   const [imageFile, setImageFile] = useState(null);
   const [categories, setCategories] = useState([]);
+  const [authors, setAuthors] = useState([]);
+  const [selectedAuthor, setSelectedAuthor] = useState('');
+  const [selectedEditor, setSelectedEditor] = useState('');
+  const [selectedDeveloper, setSelectedDeveloper] = useState('');
   const [isSlugEditable, setIsSlugEditable] = useState(false);
-
-  // Static username
-  const username = 'admin';
 
   useEffect(() => {
     fetchCategories();
+    fetchAuthors();
     const savedState = JSON.parse(localStorage.getItem('blogFormState'));
     if (savedState) {
       setQuillContent(savedState.quillContent || '');
@@ -39,6 +41,9 @@ function Blogs() {
       setDescription(savedState.description || '');
       setMetaDescription(savedState.metaDescription || '');
       setImage(savedState.image || null);
+      setSelectedAuthor(savedState.selectedAuthor || '');
+      setSelectedEditor(savedState.selectedEditor || '');
+      setSelectedDeveloper(savedState.selectedDeveloper || '');
     }
   }, []);
 
@@ -59,9 +64,12 @@ function Blogs() {
       description,
       metaDescription,
       image,
+      selectedAuthor,
+      selectedEditor,
+      selectedDeveloper
     };
     localStorage.setItem('blogFormState', JSON.stringify(formState));
-  }, [quillContent, selectedCategory, selectedLanguage, slug, title, metaTitle, description, metaDescription, image]);
+  }, [quillContent, selectedCategory, selectedLanguage, slug, title, metaTitle, description, metaDescription, image, selectedAuthor, selectedEditor, selectedDeveloper]);
 
   const fetchCategories = async () => {
     try {
@@ -73,6 +81,19 @@ function Blogs() {
       setCategories(data);
     } catch (error) {
       console.error('Error fetching categories:', error.message);
+    }
+  };
+
+  const fetchAuthors = async () => {
+    try {
+      const response = await fetch('/api/authors');
+      if (!response.ok) {
+        throw new Error('Failed to fetch authors');
+      }
+      const data = await response.json();
+      setAuthors(data);
+    } catch (error) {
+      console.error('Error fetching authors:', error.message);
     }
   };
 
@@ -92,7 +113,7 @@ function Blogs() {
   };
 
   const handleSubmit = async () => {
-    if (!title || !quillContent || !metaDescription || !metaTitle || !description || !selectedCategory || !selectedLanguage) {
+    if (!title || !quillContent || !metaDescription || !metaTitle || !description || !selectedCategory || !selectedLanguage || !selectedAuthor || !selectedEditor || !selectedDeveloper) {
       setError('Please fill in all the fields.');
       return;
     }
@@ -111,7 +132,9 @@ function Blogs() {
       if (imageFile) {
         formData.append('image', imageFile); // Use the image file
       }
-      formData.append('author', username);
+      formData.append('author', selectedAuthor); // Use the selected author
+      formData.append('editor', selectedEditor); // Use the selected editor
+      formData.append('developer', selectedDeveloper); // Use the selected developer
       formData.append('slug', slug);
       formData.append('createdAt', new Date().toISOString());
       formData.append('isDraft', JSON.stringify(false));
@@ -268,6 +291,7 @@ function Blogs() {
                 className="w-full border border-gray-300 rounded-lg p-3 shadow-sm"
               >
                 <option value="en">English</option>
+                {/* Add other language options as needed */}
                 <option value="fr">French</option>
                 <option value="zh-HANT">中国传统的</option>
                 <option value="zh-HANS">简体中文</option>
@@ -284,6 +308,54 @@ function Blogs() {
                 <option value="de">Deutsch</option>
               </select>
             </div>
+            <div className="mb-6">
+              <label htmlFor="author" className="block mb-2 text-lg font-medium">Author*</label>
+              <select
+                id="author"
+                value={selectedAuthor}
+                onChange={(e) => setSelectedAuthor(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg p-3 shadow-sm"
+              >
+                <option value="" disabled>Select an author</option>
+                {authors
+                  .filter((author) => author.role === 'Author')
+                  .map((author) => (
+                    <option key={author._id} value={author.name}>{author.name}</option>
+                  ))}
+              </select>
+            </div>
+            <div className="mb-6">
+              <label htmlFor="editor" className="block mb-2 text-lg font-medium">Editor*</label>
+              <select
+                id="editor"
+                value={selectedEditor}
+                onChange={(e) => setSelectedEditor(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg p-3 shadow-sm"
+              >
+                <option value="" disabled>Select an editor</option>
+                {authors
+                  .filter((author) => author.role === 'Editor')
+                  .map((author) => (
+                    <option key={author._id} value={author.name}>{author.name}</option>
+                  ))}
+              </select>
+            </div>
+            <div className="mb-6">
+              <label htmlFor="developer" className="block mb-2 text-lg font-medium">Developer*</label>
+              <select
+                id="developer"
+                value={selectedDeveloper}
+                onChange={(e) => setSelectedDeveloper(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg p-3 shadow-sm"
+              >
+                <option value="" disabled>Select a developer</option>
+                {authors
+                  .filter((author) => author.role === 'Developer')
+                  .map((author) => (
+                    <option key={author._id} value={author.name}>{author.name}</option>
+                  ))}
+              </select>
+            </div>
             <div className="mb-3">
               <label htmlFor="image" className="block mb-2 text-lg font-medium">Image</label>
               <input
@@ -297,7 +369,7 @@ function Blogs() {
                   <Image src={image} alt="Preview" width={100} height={100} className="rounded-lg shadow-md" />
                 </div>
               )}
-              <p className="text-gray-600 text-sm mt-1">Valid image type: jpg/jpeg/png/svg</p>
+              <p className="text-gray-600 text-sm mt-1">Valid image size: 400 * 270 px </p>
             </div>
             <button
               className="bg-blue-500 text-white p-3 rounded-lg w-full mb-4 shadow-md"

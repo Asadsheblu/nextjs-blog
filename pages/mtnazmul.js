@@ -1,11 +1,12 @@
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaEnvelope, FaKey, FaEye, FaEyeSlash } from "react-icons/fa";
 import Image from "next/image";
 // import signIn from "../public/login.svg";
 import Link from "next/link";
 import { ToastContainer, toast } from "react-toastify";
-
+import "react-toastify/dist/ReactToastify.css";
+import signIn from "../public/login.svg";
 function Login() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -14,6 +15,13 @@ function Login() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  useEffect(() => {
+    const user = localStorage.getItem("user");
+    if (user) {
+      router.push("/dashbaord/dashbaord");
+    }
+  }, []);
+
   const handleSubmitLogin = (event) => {
     event.preventDefault();
     setError("");
@@ -21,6 +29,7 @@ function Login() {
 
     if (email === "admin@gmail.com" && password === "admin") {
       toast.success("Login successful!");
+      localStorage.setItem("user", JSON.stringify({ email }));
       router.push("/dashbaord/dashbaord");
     } else {
       toast.error("Invalid email or password");
@@ -34,9 +43,9 @@ function Login() {
       <div className="flex flex-col md:flex-row items-center justify-center w-full max-w-4xl">
         <ToastContainer />
         {/* Illustration Section */}
-        {/* <div className="hidden md:block md:w-1/2">
+        <div className="hidden md:block md:w-1/2">
           <Image src={signIn} alt="Illustration" className="w-4/4 h-auto" />
-        </div> */}
+        </div>
         {/* Form Section */}
         <div className="bg-white p-8 rounded-lg shadow-lg w-full md:w-1/2">
           <h2 className="text-3xl font-semibold text-gray-700 mb-6 text-center">Login</h2>
@@ -83,9 +92,7 @@ function Login() {
               {isLoading ? "Logging in..." : "Login"}
             </button>
           </form>
-          <p className="mt-4 text-center text-gray-600">
-            Do not have an account? <Link href="/register" className="text-red-500 hover:underline">Create an account</Link>.
-          </p>
+        
         </div>
       </div>
     </div>

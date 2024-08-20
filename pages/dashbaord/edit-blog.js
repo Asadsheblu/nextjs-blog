@@ -11,7 +11,7 @@ const QuillWrapper = dynamic(() => import('../../components/EditorWrapper'), { s
 function EditBlog() {
   const router = useRouter();
   const { id } = router.query;
-
+  const [slug, setSlug] = useState('');
   const [quillContent, setQuillContent] = useState('');
   const [error, setError] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -24,9 +24,15 @@ function EditBlog() {
   const [isDraft, setIsDraft] = useState(false);
   const [language, setLanguage] = useState('en'); // Default language
   const [initialImage, setInitialImage] = useState(null);
+  const [authors, setAuthors] = useState([]); // Authors list
+  const [selectedAuthor, setSelectedAuthor] = useState(''); // Selected author
+  const [selectedEditor, setSelectedEditor] = useState(''); // Selected editor
+  const [selectedDeveloper, setSelectedDeveloper] = useState(''); // Selected developer
+  const [isSlugEditable, setIsSlugEditable] = useState(false); // Track if slug is editable
 
   useEffect(() => {
     fetchCategories();
+    fetchAuthors();
     if (id) {
       fetchBlogData(id, language);
     }
@@ -45,6 +51,19 @@ function EditBlog() {
     }
   };
 
+  const fetchAuthors = async () => {
+    try {
+      const response = await fetch('/api/authors');
+      if (!response.ok) {
+        throw new Error('Failed to fetch authors');
+      }
+      const data = await response.json();
+      setAuthors(data);
+    } catch (error) {
+      console.error('Error fetching authors:', error.message);
+    }
+  };
+
   const fetchBlogData = async (id, lang) => {
     try {
       const response = await fetch(`/api/blogs?id=${id}`);
@@ -58,17 +77,33 @@ function EditBlog() {
         setSelectedCategory(translation.category);
         setTitle(translation.title);
         setMetaTitle(translation.metaTitle);
+        setSlug(translation?.slug);
         setMetaDescription(translation.metaDescription);
         setDescription(translation.description);
         setInitialImage(translation.image);
+        setSelectedAuthor(data.author); // Set the selected author
+        setSelectedEditor(data.editor); // Set the selected editor
+        setSelectedDeveloper(data.developer); // Set the selected developer
+
+        // Auto-select feature image logic
+        if (!translation.image) {
+          const firstImageMatch = translation.content.match(/<img[^>]+src="?([^"\s]+)"?\s*\/>/);
+          if (firstImageMatch && firstImageMatch[1]) {
+            setInitialImage(firstImageMatch[1]);
+          }
+        }
       } else {
         // Clear the form if the translation for the selected language does not exist
         setQuillContent('');
         setSelectedCategory('');
         setTitle('');
+        setSlug('');
         setMetaTitle('');
         setMetaDescription('');
         setDescription('');
+        setSelectedAuthor(''); // Clear the selected author
+        setSelectedEditor(''); // Clear the selected editor
+        setSelectedDeveloper(''); // Clear the selected developer
       }
       setIsDraft(data.isDraft);
     } catch (error) {
@@ -84,22 +119,22 @@ function EditBlog() {
       const formData = new FormData();
       formData.append('content', quillContent);
       formData.append('title', title);
+      formData.append('slug', slug);  // Use the slug from state
       formData.append('metaTitle', metaTitle);
       formData.append('metaDescription', metaDescription);
       formData.append('description', description);
       if (image) {
         formData.append('image', image);
+      } else if (initialImage) {
+        formData.append('image', initialImage);
       }
       formData.append('category', selectedCategory);
-      formData.append('author', 'Admin'); // Set author to "Admin"
-      formData.append('authorProfile', ''); // No author profile
+      formData.append('author', selectedAuthor); // Set selected author
+      formData.append('editor', selectedEditor); // Set selected editor
+      formData.append('developer', selectedDeveloper); // Set selected developer
       formData.append('createdAt', new Date().toISOString());
       formData.append('isDraft', JSON.stringify(isDraft));
       formData.append('language', language); // Append language
-
-      // Generate slug from title
-      const slug = title.toLowerCase().split(' ').join('-');
-      formData.append('slug', slug); // Append slug
 
       const response = await fetch(`/api/blogs?id=${id}`, {
         method,
@@ -118,7 +153,7 @@ function EditBlog() {
       console.error('Error updating content:', error.message);
       setError(error.message);
     }
-  }, [quillContent, selectedCategory, metaTitle, metaDescription, description, title, image, isDraft, id, router, language]);
+  }, [quillContent, selectedCategory, metaTitle, metaDescription, description, title, slug, image, initialImage, isDraft, id, router, language, selectedAuthor, selectedEditor, selectedDeveloper]);
 
   const handleQuillChange = useCallback((newContent) => {
     setQuillContent(newContent);
@@ -141,6 +176,22 @@ function EditBlog() {
 
   const handleLanguageChange = (e) => {
     setLanguage(e.target.value);
+  };
+
+  const handleAuthorChange = (e) => {
+    setSelectedAuthor(e.target.value);
+  };
+
+  const handleEditorChange = (e) => {
+    setSelectedEditor(e.target.value);
+  };
+
+  const handleDeveloperChange = (e) => {
+    setSelectedDeveloper(e.target.value);
+  };
+
+  const toggleSlugEditable = () => {
+    setIsSlugEditable(!isSlugEditable);
   };
 
   return (
@@ -234,10 +285,20 @@ function EditBlog() {
             <input
               id="slug"
               type="text"
-              value={title.toLowerCase().split(' ').join('-')}
-              readOnly
+              value={slug}
+              onChange={(e) => setSlug(e.target.value)}
               className="w-full border border-gray-300 rounded-lg p-3 bg-gray-100 shadow-sm"
+              disabled={!isSlugEditable} // Disable editing unless the checkbox is checked
             />
+            <div className="mt-2">
+              <input
+                type="checkbox"
+                id="editSlug"
+                checked={isSlugEditable}
+                onChange={toggleSlugEditable}
+              />
+              <label htmlFor="editSlug" className="ml-2 cursor-pointer text-blue-600 hover:underline">Edit Slug</label>
+            </div>
           </div>
           <div className="mb-3">
             <label htmlFor="description" className="block mb-2 text-lg font-medium">Description*</label>
@@ -248,6 +309,54 @@ function EditBlog() {
               className="w-full border border-gray-300 rounded-lg p-3 shadow-sm"
             />
             <p className="text-gray-600 text-sm mt-1">Description max 200 characters</p>
+          </div>
+          <div className="mb-3">
+            <label htmlFor="author" className="block mb-2 text-lg font-medium">Author*</label>
+            <select
+              id="author"
+              value={selectedAuthor}
+              onChange={handleAuthorChange}
+              className="w-full border border-gray-300 rounded-lg p-3 shadow-sm"
+            >
+              <option value="" disabled>Select an author</option>
+              {authors
+                .filter((author) => author.role === 'Author')
+                .map((author) => (
+                  <option key={author._id} value={author.name}>{author.name}</option>
+                ))}
+            </select>
+          </div>
+          <div className="mb-3">
+            <label htmlFor="editor" className="block mb-2 text-lg font-medium">Editor*</label>
+            <select
+              id="editor"
+              value={selectedEditor}
+              onChange={handleEditorChange}
+              className="w-full border border-gray-300 rounded-lg p-3 shadow-sm"
+            >
+              <option value="" disabled>Select an editor</option>
+              {authors
+                .filter((author) => author.role === 'Editor')
+                .map((author) => (
+                  <option key={author._id} value={author.name}>{author.name}</option>
+                ))}
+            </select>
+          </div>
+          <div className="mb-3">
+            <label htmlFor="developer" className="block mb-2 text-lg font-medium">Developer*</label>
+            <select
+              id="developer"
+              value={selectedDeveloper}
+              onChange={handleDeveloperChange}
+              className="w-full border border-gray-300 rounded-lg p-3 shadow-sm"
+            >
+              <option value="" disabled>Select a developer</option>
+              {authors
+                .filter((author) => author.role === 'Developer')
+                .map((author) => (
+                  <option key={author._id} value={author.name}>{author.name}</option>
+                ))}
+            </select>
           </div>
           <div className="mb-3">
             <label htmlFor="image" className="block mb-2 text-lg font-medium">Image</label>
@@ -267,7 +376,7 @@ function EditBlog() {
                 <Image src={URL.createObjectURL(image)} alt="Preview" width={300} height={200} className="w-full h-auto rounded-lg shadow-md" />
               </div>
             )}
-            <p className="text-gray-600 text-sm mt-1">Valid image type: jpg/jpeg/png/svg</p>
+            <p className="text-gray-600 text-sm mt-1">Valid image size: 400 * 270 px </p>
           </div>
           <div className="mb-3 col-span-2">
             <label htmlFor="content" className="block mb-2 text-lg font-medium">Content*</label>
