@@ -90,7 +90,7 @@ const Layout = ({ children }) => {
                   : 'text-gray-600 hover:bg-gray-200 hover:text-gray-700'
               }`}
             >
-              <FaTachometerAlt className="mr-3 text-info" /> <span className="mx-3">dashbaord</span>
+              <FaTachometerAlt className="mr-3 text-info" /> <span className="mx-3">Dashbaord</span>
             </p>
           </Link>
         

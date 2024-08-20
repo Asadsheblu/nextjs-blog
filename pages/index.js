@@ -25,7 +25,7 @@ export async function getStaticProps({ locale }) {
     return {
       props: {
         initialBlogs: data,
-        ...(await serverSideTranslations(locale, ['common', 'navbar', 'footer'])),
+        ...(await serverSideTranslations(locale, ['blog', 'navbar', 'footer'])),
       },
       revalidate: 60, // Re-generate the page every 60 seconds
     };
@@ -34,7 +34,7 @@ export async function getStaticProps({ locale }) {
     return {
       props: {
         initialBlogs: [],
-        ...(await serverSideTranslations(locale, ['common', 'navbar', 'footer'])),
+        ...(await serverSideTranslations(locale, ['blog', 'navbar', 'footer'])),
       },
     };
   }

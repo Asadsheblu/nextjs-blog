@@ -4,17 +4,19 @@ import Link from 'next/link';
 import team from "../public/team.webp"
 import sb from "../public/sb.webp"
 const PromoSection = () => {
+  const scrollToBlogs = () => {
+    document.getElementById('all-blog').scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <div className="promo-section bg-gray-100 flex p-5">
       <div className="container max-w-7xl   flex flex-col md:flex-row items-center justify-between">
         <div className="promo-text max-w-lg pt-20 pb-20">
           <h2 className="text-3xl md:text-5xl font-bold text-gray-800 mb-4">Unlock Your Online Earning Potential</h2>
           <p className="text-gray-600 mb-6">Tap into the latest opportunities to monetize your skills and passions.</p>
-          <button  className='btn btn-danger rounded-lg pt-3 pb-3 ps-5 pe-5'>
-          <Link className='text-white' href="/blog">
-           Read Our Blog
-          </Link>
-          </button>
+       
+          <button  onClick={scrollToBlogs} className='btn btn-danger rounded-lg pt-3 pb-3 ps-5 pe-5'>Read Blog</button>
+          
           
         </div>
         <div className="promo-images relative mt-20 md:mt-0 flex justify-end">

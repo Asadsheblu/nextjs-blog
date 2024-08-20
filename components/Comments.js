@@ -71,16 +71,28 @@ const ReplyModal = ({ isOpen, onClose, onSubmit, parentId }) => {
           <div className="mb-4">
             <label htmlFor="captcha" className="block mb-2 font-bold text-gray-700">Captcha</label>
             <div
-              className="mb-2 p-2 bg-gray-200 text-center text-xl font-bold rounded-md"
+              className="mb-2 p-2 bg-gray-200 text-center text-xl font-bold rounded-md relative"
               style={{
-                filter: 'blur(2px)',
                 fontFamily: "'Courier New', Courier, monospace",
                 letterSpacing: '2px',
-                background: 'linear-gradient(135deg, #f3f4f6 25%, #e5e7eb 25%, #e5e7eb 50%, #f3f4f6 50%, #f3f4f6 75%, #e5e7eb 75%, #e5e7eb)',
-                backgroundSize: '10px 10px',
+                background: 'url("/path/to/your/background-image.png")', // Use a background image for added complexity
+                backgroundSize: 'cover',
+                position: 'relative',
+                display: 'inline-block',
+                transform: 'rotate(-5deg)', // Slight rotation for obfuscation
+                userSelect: 'none',
               }}
             >
-              {captcha}
+              <span
+                style={{
+                  color: 'transparent',
+                  textShadow: '0 0 10px rgba(0, 0, 0, 0.5)', // Add shadow for noise
+                  backgroundClip: 'text',
+                  webkitBackgroundClip: 'text',
+                }}
+              >
+                {captcha}
+              </span>
             </div>
             <input
               type="text"
@@ -264,69 +276,79 @@ const Comments = ({ slug }) => {
   return (
     <div className="w-full max-w-full pt-4 pb-4">
       <ToastContainer />
-     <div className='border bg-white shadow-sm p-5 mb-5'>
-     <h2 className="text-3xl font-bold mb-6">Leave Comments</h2>
-      <form onSubmit={handleCommentSubmit} className="mb-6">
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Your name"
-          className="w-full md:w-1/2 p-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-          required
-        />
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Your email"
-          className="w-full md:w-1/2 me-2 p-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-          required
-        />
-        <textarea
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-          placeholder="Write a comment..."
-          className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-          rows="4"
-          required
-        />
-        <div className="mb-4">
-          <label htmlFor="captcha" className="block text-gray-700 font-bold mb-2">Captcha</label>
-          <div
-            className="captcha mb-2 bg-gray-200 p-2 rounded-md text-center"
-            style={{
-              filter: 'blur(2px)',
-              fontFamily: "'Courier New', Courier, monospace",
-              fontSize: '24px',
-              fontWeight: 'bold',
-              letterSpacing: '2px',
-              background: 'linear-gradient(135deg, #f3f4f6 25%, #e5e7eb 25%, #e5e7eb 50%, #f3f4f6 50%, #f3f4f6 75%, #e5e7eb 75%, #e5e7eb)',
-              backgroundSize: '10px 10px'
-            }}
-          >
-            {captcha}
-          </div>
+      <div className='border bg-white shadow-sm p-5 mb-5'>
+        <h2 className="text-3xl font-bold mb-6">Leave Comments</h2>
+        <form onSubmit={handleCommentSubmit} className="mb-6">
           <input
             type="text"
-            id="captcha"
-            value={captchaInput}
-            onChange={(e) => setCaptchaInput(e.target.value)}
-            placeholder="Enter captcha"
-            className="w-full md:w-1/2 p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Your name"
+            className="w-full md:w-1/2 p-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
             required
           />
-          {captchaError && <p className="text-red-500">{captchaError}</p>}
-        </div>
-        <button
-          type="submit"
-          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none"
-          disabled={loading}
-        >
-          {loading ? 'Posting...' : 'Post Comment'}
-        </button>
-      </form>
-     </div>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Your email"
+            className="w-full md:w-1/2 me-2 p-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+            required
+          />
+          <textarea
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            placeholder="Write a comment..."
+            className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+            rows="4"
+            required
+          />
+          <div className="mb-4">
+            <label htmlFor="captcha" className="block text-gray-700 font-bold mb-2">Captcha</label>
+            <div
+              className="mb-2 p-2 bg-gray-200 text-center text-xl font-bold rounded-md relative"
+              style={{
+                fontFamily: "'Courier New', Courier, monospace",
+                letterSpacing: '2px',
+                background: 'url("/path/to/your/background-image.png")', // Use a background image for added complexity
+                backgroundSize: 'cover',
+                position: 'relative',
+                display: 'inline-block',
+                transform: 'rotate(-3deg)', // Slight rotation for obfuscation
+                userSelect: 'none',
+              }}
+            >
+              <span
+                style={{
+                  color: 'transparent',
+                  textShadow: '0 0 3px rgba(0, 0, 0, 0.3)', // Reduced blur effect
+                  backgroundClip: 'text',
+                  webkitBackgroundClip: 'text',
+                }}
+              >
+                {captcha}
+              </span>
+            </div>
+            <input
+              type="text"
+              id="captcha"
+              value={captchaInput}
+              onChange={(e) => setCaptchaInput(e.target.value)}
+              placeholder="Enter captcha"
+              className="w-full md:w-1/2 p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+              required
+            />
+            {captchaError && <p className="text-red-500">{captchaError}</p>}
+          </div>
+          <button
+            type="submit"
+            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none"
+            disabled={loading}
+          >
+            {loading ? 'Posting...' : 'Post Comment'}
+          </button>
+        </form>
+      </div>
      
       {error && <p className="text-red-500 mb-4">{error}</p>}
       <div className="w-full max-w-full">

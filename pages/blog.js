@@ -38,7 +38,7 @@ const BlogSection = ({ initialBlogs = [] }) => {
   const [error, setError] = useState('');
   const [blogsData, setBlogsData] = useState(initialBlogs);
   const blogsPerPage = 9;
-  const currentLanguage = i18n.language || 'en';
+  const currentLanguage = i18n.language || 'en'; // Default to English if no language is set
   const [searchQuery, setSearchQuery] = useState('');
   const [currentCategory, setCurrentCategory] = useState(selectedCategory || '');
 
@@ -150,7 +150,7 @@ const BlogSection = ({ initialBlogs = [] }) => {
   }
 
   if (processedBlogs.length === 0) {
-    return <p>No blogs available in this language.</p>;
+    return <p className="text-center text-gray-600 text-xl mt-10">No blogs available in this language.</p>;
   }
 
   return (
@@ -182,7 +182,7 @@ const BlogSection = ({ initialBlogs = [] }) => {
                         alt={content.title}
                         width={400}
                         height={260}
-                      className='blog-img'
+                        className='blog-img'
                         quality={50} // Image quality reduced
                       />
                       <div className="absolute top-2 left-2 bg-blue-500 text-white text-sm rounded-full px-2 py-1">
@@ -304,102 +304,100 @@ const BlogSection = ({ initialBlogs = [] }) => {
 
         <div className="text-white rounded-lg relative w-full mt-5 mb-5">
         
-<div className="flex justify-center mb-4">
-  <ul className="flex flex-wrap justify-center space-x-2">
-    <li
-      className={`px-4 py-2 list-none rounded-full text-sm font-medium border ${!currentCategory ? 'bg-purple-700 text-white' : 'bg-white text-gray-700'}`}
-      onClick={() => handleCategoryChange('')}
-    >
-      <span className="cursor-pointer">All Posts</span>
-    </li>
-    {uniqueCategories.map((category) => {
-      const slug = createCategorySlug(category);
-      return (
-        <li
-          key={slug}
-          className={`px-4 py-2 list-none rounded-full text-sm font-medium border ${currentCategory === slug ? 'bg-purple-700 text-white' : 'bg-white text-gray-700'}`}
-          onClick={() => handleCategoryChange(slug)}
-        >
-          <span className="cursor-pointer">{category}</span>
-        </li>
-      );
-    })}
-  </ul>
-</div>
+          <div className="flex justify-center mb-4">
+            <ul className="flex flex-wrap justify-center space-x-2">
+              <li
+                className={`px-4 py-2 list-none rounded-full text-sm font-medium border ${!currentCategory ? 'bg-purple-700 text-white' : 'bg-white text-gray-700'}`}
+                onClick={() => handleCategoryChange('')}
+              >
+                <span className="cursor-pointer">All Posts</span>
+              </li>
+              {uniqueCategories.map((category) => {
+                const slug = createCategorySlug(category);
+                return (
+                  <li
+                    key={slug}
+                    className={`px-4 py-2 list-none rounded-full text-sm font-medium border ${currentCategory === slug ? 'bg-purple-700 text-white' : 'bg-white text-gray-700'}`}
+                    onClick={() => handleCategoryChange(slug)}
+                  >
+                    <span className="cursor-pointer">{category}</span>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
 
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
-  {currentBlogs.slice(0, 9).map((blog, index) => {
-    const content = blog.translations[currentLanguage];
-    return (
-      <div key={index} className="bg-white shadow-md rounded-lg overflow-hidden relative">
-        <div className='w-[400px] h-[270px]'>
-          {content.image && (
-            <Image
-              src={content.image}
-              alt={getTitle(content)}
-              width={400}
-              height={270}
-              className='blog-img'
-              quality={50} // Image quality reduced
-            />
+          <div id='all-blog' className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
+            {currentBlogs.slice(0, 9).map((blog, index) => {
+              const content = blog.translations[currentLanguage];
+              return (
+                <div key={index} className="bg-white shadow-md rounded-lg overflow-hidden relative">
+                  <div className='w-[400px] h-[270px]'>
+                    {content.image && (
+                      <Image
+                        src={content.image}
+                        alt={getTitle(content)}
+                        width={400}
+                        height={270}
+                        className='blog-img'
+                        quality={50} // Image quality reduced
+                      />
+                    )}
+                  </div>
+                  <div className="absolute top-2 left-2 bg-blue-500 text-white text-sm rounded-full px-2 py-1">
+                    <span className="mr-2">{content?.category}</span>
+                  </div>
+                  <div className="border-t ps-4 pe-4 pt-2 d-flex">
+                    <p className="text-sm text-gray-500">
+                      <FaUserCircle className="text-center fs-6 text-red-400 inline" /> {blog.author}
+                    </p>
+                    <p className="text-sm text-gray-500 ms-auto">
+                      <FaCalendar className="text-center text-red-400 inline" />
+                      {format(new Date(blog.createdAt), 'dd/MM/yyyy')}
+                    </p>
+                  </div>
+                  <div className="p-4">
+                    <h4 className="text-lg font-semibold">
+                      <Link href={`/blog/${content.slug}`} passHref>
+                        <span className="text-blue-500 text-xl font-bold hover:underline">{getTitle(content)}</span>
+                      </Link>
+                    </h4>
+                    <p className="text-gray-500 text-sm">{content?.description}</p>
+                    <div className="mt-2">
+                      {parseCategories(blog.category).map((category, i) => (
+                        <span key={i} className="text-sm bg-gray-200 text-gray-700 rounded-full px-2 py-1 mr-2">
+                          {category}
+                        </span>
+                      ))}
+                    </div>
+                    <Link href={`/blog/${content.slug}`} passHref>
+                      <span className="text-red-500 mt-4 block">Read More →</span>
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="flex justify-center mt-8">
+          {totalPages > 1 && (
+            <nav className="block">
+              <ul className="flex pl-0 rounded list-none flex-wrap">
+                {Array.from({ length: totalPages }, (_, index) => (
+                  <li key={index} className="page-item">
+                    <button
+                      onClick={() => paginate(index + 1)}
+                      className={`page-link ${currentPage === index + 1 ? 'bg-blue-500 text-white' : 'bg-white text-blue-500'}`}
+                    >
+                      {index + 1}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </nav>
           )}
         </div>
-        <div className="absolute top-2 left-2 bg-blue-500 text-white text-sm rounded-full px-2 py-1">
-          <span className="mr-2">{content?.category}</span>
-        </div>
-        <div className="border-t ps-4 pe-4 pt-2 d-flex">
-          <p className="text-sm text-gray-500">
-            <FaUserCircle className="text-center fs-6 text-red-400 inline" /> {blog.author}
-          </p>
-          <p className="text-sm text-gray-500 ms-auto">
-            <FaCalendar className="text-center text-red-400 inline" />
-            {format(new Date(blog.createdAt), 'dd/MM/yyyy')}
-          </p>
-        </div>
-        <div className="p-4">
-          <h4 className="text-lg font-semibold">
-            <Link href={`/blog/${content.slug}`} passHref>
-              <span className="text-blue-500 text-xl font-bold hover:underline">{getTitle(content)}</span>
-            </Link>
-          </h4>
-          <p className="text-gray-500 text-sm">{content?.description}</p>
-          <div className="mt-2">
-            {parseCategories(blog.category).map((category, i) => (
-              <span key={i} className="text-sm bg-gray-200 text-gray-700 rounded-full px-2 py-1 mr-2">
-                {category}
-              </span>
-            ))}
-          </div>
-          <Link href={`/blog/${content.slug}`} passHref>
-            <span className="text-red-500 mt-4 block">Read More →</span>
-          </Link>
-        </div>
-      </div>
-    );
-  })}
-</div>
-
-
-        </div>
-        <div className="flex justify-center mt-8">
-  {totalPages > 1 && ( // Only show pagination if there are more than one page
-    <nav className="block">
-      <ul className="flex pl-0 rounded list-none flex-wrap">
-        {Array.from({ length: totalPages }, (_, index) => (
-          <li key={index} className="page-item">
-            <button
-              onClick={() => paginate(index + 1)}
-              className={`page-link ${currentPage === index + 1 ? 'bg-blue-500 text-white' : 'bg-white text-blue-500'}`}
-            >
-              {index + 1}
-            </button>
-          </li>
-        ))}
-      </ul>
-    </nav>
-  )}
-</div>
-
       </div>
     </div>
   );
@@ -414,7 +412,7 @@ export async function getServerSideProps({ locale, req }) {
     return {
       props: {
         initialBlogs: data,
-        ...(await serverSideTranslations(locale, ['common', 'navbar', 'footer'])),
+        ...(await serverSideTranslations(locale, ['blog', 'navbar', 'footer'])),
       },
     };
   } catch (error) {
@@ -422,7 +420,7 @@ export async function getServerSideProps({ locale, req }) {
     return {
       props: {
         initialBlogs: [],
-        ...(await serverSideTranslations(locale, ['common', 'navbar', 'footer'])),
+        ...(await serverSideTranslations(locale, ['blog', 'navbar', 'footer'])),
       },
     };
   }
