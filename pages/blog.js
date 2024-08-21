@@ -10,6 +10,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { format } from 'date-fns';
 import PromoSection from '../components/BlogPromoSection';
 
+// Utility functions
 const createSlug = (title) => {
   return title
     .toString()
@@ -30,6 +31,10 @@ const extractFirstImage = (content) => {
 const getTitle = (translation) => translation.title || translation.Title || '';
 const getContent = (translation) => translation.content || translation.Content || '';
 
+const parseCategories = (category) => {
+  return category ? category.split(',') : [];
+};
+
 const BlogSection = ({ initialBlogs = [] }) => {
   const router = useRouter();
   const { category: selectedCategory } = router.query;
@@ -37,10 +42,32 @@ const BlogSection = ({ initialBlogs = [] }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [error, setError] = useState('');
   const [blogsData, setBlogsData] = useState(initialBlogs);
+  const [categories, setCategories] = useState([]);
   const blogsPerPage = 9;
   const currentLanguage = i18n.language || 'en'; // Default to English if no language is set
   const [searchQuery, setSearchQuery] = useState('');
   const [currentCategory, setCurrentCategory] = useState(selectedCategory || '');
+
+  const fetchCategories = useCallback(async () => {
+    try {
+      const response = await axios.get('/api/categories');
+      const filteredCategories = response.data.map(category => {
+        const translation = category.translations[currentLanguage];
+        return {
+          ...category,
+          name: translation ? translation.name : category.name,
+          slug: translation ? translation.slug : category.slug
+        };
+      });
+      setCategories(filteredCategories);
+    } catch (error) {
+      console.error('Error fetching categories:', error.message);
+    }
+  }, [currentLanguage]);
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
 
   const processedBlogs = useMemo(() => {
     return blogsData.map(blog => {
@@ -57,12 +84,16 @@ const BlogSection = ({ initialBlogs = [] }) => {
         translation.image = extractFirstImage(content);
       }
 
+      // Ensure _id and other essential fields are preserved
       return {
-        ...blog,
+        _id: blog._id,  // Preserve the _id
+        createdAt: blog.createdAt,  // Preserve other essential fields
+        author: blog.author,
+        ...blog, // Spread the rest of the blog object to include all other fields
         translations: {
           ...blog.translations,
-          [lang]: translation,
-          [currentLanguage]: blog.translations[currentLanguage] || translation,
+          [lang]: translation, // Merge the language-specific translations
+          [currentLanguage]: blog.translations[currentLanguage] || translation, // Use current language or fallback
         },
       };
     }).filter(blog => blog.translations[currentLanguage]);
@@ -94,7 +125,7 @@ const BlogSection = ({ initialBlogs = [] }) => {
   const fetchBlogs = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`/api/blogs`);
+      const response = await axios.get('/api/blogs');
       setBlogsData(response.data);
       setLoading(false);
     } catch (error) {
@@ -121,10 +152,6 @@ const BlogSection = ({ initialBlogs = [] }) => {
     }, undefined, { shallow: true });
   };
 
-  const parseCategories = (category) => {
-    return category ? category.split(',') : [];
-  };
-
   const createCategorySlug = (category) => {
     return category
       .toLowerCase()
@@ -133,9 +160,6 @@ const BlogSection = ({ initialBlogs = [] }) => {
   };
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-  const categoriesSet = new Set(processedBlogs.map(blog => blog.translations[currentLanguage].category));
-  const uniqueCategories = Array.from(categoriesSet);
 
   if (loading) {
     return (
@@ -186,7 +210,7 @@ const BlogSection = ({ initialBlogs = [] }) => {
                         quality={50} // Image quality reduced
                       />
                       <div className="absolute top-2 left-2 bg-blue-500 text-white text-sm rounded-full px-2 py-1">
-                        <span className="mr-2">{content?.category}</span>
+                        <span className="mr-2">{content?.category || content._id}</span>
                       </div>
                     </div>
                   )}
@@ -237,7 +261,7 @@ const BlogSection = ({ initialBlogs = [] }) => {
                         quality={50} // Image quality reduced
                       />
                       <div className="absolute top-2 left-2 bg-blue-500 text-white text-sm rounded-full px-2 py-1">
-                        <span className="mr-2">{content?.category}</span>
+                        <span className="mr-2">{content?.category || content._id}</span>
                       </div>
                     </div>
                   )}
@@ -312,15 +336,14 @@ const BlogSection = ({ initialBlogs = [] }) => {
               >
                 <span className="cursor-pointer">All Posts</span>
               </li>
-              {uniqueCategories.map((category) => {
-                const slug = createCategorySlug(category);
+              {categories.map((category) => {
                 return (
                   <li
-                    key={slug}
-                    className={`px-4 py-2 list-none rounded-full text-sm font-medium border ${currentCategory === slug ? 'bg-purple-700 text-white' : 'bg-white text-gray-700'}`}
-                    onClick={() => handleCategoryChange(slug)}
+                    key={category.slug}
+                    className={`px-4 py-2 list-none rounded-full text-sm font-medium border ${currentCategory === category.slug ? 'bg-purple-700 text-white' : 'bg-white text-gray-700'}`}
+                    onClick={() => handleCategoryChange(category.slug)}
                   >
-                    <span className="cursor-pointer">{category}</span>
+                    <span className="cursor-pointer">{category.name}</span>
                   </li>
                 );
               })}
@@ -345,7 +368,7 @@ const BlogSection = ({ initialBlogs = [] }) => {
                     )}
                   </div>
                   <div className="absolute top-2 left-2 bg-blue-500 text-white text-sm rounded-full px-2 py-1">
-                    <span className="mr-2">{content?.category}</span>
+                    <span className="mr-2">{content?.category || content._id}</span>
                   </div>
                   <div className="border-t ps-4 pe-4 pt-2 d-flex">
                     <p className="text-sm text-gray-500">

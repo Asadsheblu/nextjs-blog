@@ -1,6 +1,11 @@
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 
-const Breadcrumb = ({ categoryName, blogTitle }) => {
+const Breadcrumb = ({ categoryName, blogTitle, translations }) => {
+
+  const router = useRouter();
+  const currentLanguage = router.locale || 'en';
+
   // Function to convert category name to a slug
   const generateSlug = (name) => {
     if (!name) {
@@ -12,7 +17,13 @@ const Breadcrumb = ({ categoryName, blogTitle }) => {
       .replace(/[^\w-]+/g, ''); // Remove all non-word characters except hyphens
   };
 
-  const categorySlug = generateSlug(categoryName);
+  // Get the translated category name based on the current language
+  const translatedCategoryName = translations && translations[currentLanguage]?.name 
+    ? translations[currentLanguage].name 
+    : categoryName;
+
+  const categorySlug = generateSlug(translatedCategoryName);
+console.log(categorySlug);
 
   return (
     <nav aria-label="breadcrumb">
@@ -24,7 +35,7 @@ const Breadcrumb = ({ categoryName, blogTitle }) => {
         </li>
         <li className="breadcrumb-item">
           <Link href={`/categories/${categorySlug}`}>
-            <span className="text-blue-500 hover:underline whitespace-nowrap">{categoryName || 'Unknown Category'}</span>
+            <span className="text-blue-500 hover:underline whitespace-nowrap">{translatedCategoryName || 'Unknown Category'}</span>
           </Link>
         </li>
         {blogTitle && (

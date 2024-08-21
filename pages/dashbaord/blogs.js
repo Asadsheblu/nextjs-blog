@@ -169,6 +169,7 @@ function Blogs() {
 
   const handleLanguageChange = (e) => {
     setSelectedLanguage(e.target.value);
+    setSelectedCategory(''); // Reset selected category when language changes
   };
 
   const handleImageChange = (e) => {
@@ -200,6 +201,31 @@ function Blogs() {
         <h2 className="text-3xl font-semibold mb-6">Add Post - {selectedCategory ? selectedCategory : 'Select a category'}</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="col-span-2">
+          <div className="mb-6">
+              <label htmlFor="language" className="block mb-2 text-lg font-medium">Language*</label>
+              <select
+                id="language"
+                value={selectedLanguage}
+                onChange={handleLanguageChange}
+                className="w-full border border-gray-300 rounded-lg p-3 shadow-sm"
+              >
+                <option value="en">English</option>
+                <option value="fr">French</option>
+                <option value="zh-HANT">中国传统的</option>
+                <option value="zh-HANS">简体中文</option>
+                <option value="nl">Nederlands</option>
+                <option value="gu">ગુજરાતી</option>
+                <option value="hi">हिंदी</option>
+                <option value="it">Italiano</option>
+                <option value="ja">日本語</option>
+                <option value="ko">한국어</option>
+                <option value="pl">Polski</option>
+                <option value="pt">Português</option>
+                <option value="ru">Русский</option>
+                <option value="es">Español</option>
+                <option value="de">Deutsch</option>
+              </select>
+            </div>
             <div className="mb-6">
               <label htmlFor="metaTitle" className="block mb-2 text-lg font-medium">Meta Title</label>
               <input
@@ -277,37 +303,16 @@ function Blogs() {
                 className="w-full border border-gray-300 rounded-lg p-3 shadow-sm"
               >
                 <option value="" disabled>Select a category</option>
-                {categories.map((category) => (
-                  <option key={category._id} value={category.name}>{category.name}</option>
-                ))}
+                {categories
+                  .filter((category) => category.translations && category.translations[selectedLanguage])
+                  .map((category) => (
+                    <option key={category._id} value={category._id}>
+                      {category.translations[selectedLanguage].name}
+                    </option>
+                  ))}
               </select>
             </div>
-            <div className="mb-6">
-              <label htmlFor="language" className="block mb-2 text-lg font-medium">Language*</label>
-              <select
-                id="language"
-                value={selectedLanguage}
-                onChange={handleLanguageChange}
-                className="w-full border border-gray-300 rounded-lg p-3 shadow-sm"
-              >
-                <option value="en">English</option>
-                {/* Add other language options as needed */}
-                <option value="fr">French</option>
-                <option value="zh-HANT">中国传统的</option>
-                <option value="zh-HANS">简体中文</option>
-                <option value="nl">Nederlands</option>
-                <option value="gu">ગુજરાતી</option>
-                <option value="hi">हिंदी</option>
-                <option value="it">Italiano</option>
-                <option value="ja">日本語</option>
-                <option value="ko">한국어</option>
-                <option value="pl">Polski</option>
-                <option value="pt">Português</option>
-                <option value="ru">Русский</option>
-                <option value="es">Español</option>
-                <option value="de">Deutsch</option>
-              </select>
-            </div>
+           
             <div className="mb-6">
               <label htmlFor="author" className="block mb-2 text-lg font-medium">Author*</label>
               <select

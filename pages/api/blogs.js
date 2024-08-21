@@ -189,20 +189,33 @@ const handlePostRequest = async (req, res, blogs) => {
 
 const handlePutRequest = async (req, res, blogs, query) => {
   try {
+    // Connect to the database
+    const { db } = await connectToDatabase();
+    const categoriesCollection = db.collection('categories'); // Add this line
+
     await runMiddleware(req, res, upload.single('image'));
 
     const id = query.id;
-    const { language, ...updatedData } = req.body;
+    const { language, category, ...updatedData } = req.body;
 
     if (!id) {
       return res.status(400).json({ message: 'ID is required' });
     }
 
+    // Fetch the full category details based on the provided category ID
+    const categoryData = await categoriesCollection.findOne({ _id: new ObjectId(category) });
+
+    if (!categoryData) {
+      return res.status(400).json({ message: 'Invalid category ID' });
+    }
+
+    // Get the category name based on the selected language or default to English if not available
+    const categoryName = categoryData.translations[language]?.name || categoryData.translations['en'].name;
+    console.log(categoryName);
+
     if (req.file) {
       updatedData.image = `/uploads/${req.file.filename}`;
     }
-
-    delete updatedData._id;
 
     const updateDoc = {
       $set: {
@@ -211,7 +224,7 @@ const handlePutRequest = async (req, res, blogs, query) => {
         [`translations.${language}.metaTitle`]: updatedData.metaTitle,
         [`translations.${language}.description`]: updatedData.description,
         [`translations.${language}.metaDescription`]: updatedData.metaDescription,
-        [`translations.${language}.category`]: updatedData.category,
+        [`translations.${language}.category`]: categoryName, // Store category name instead of ID
         [`translations.${language}.image`]: updatedData.image,
         [`translations.${language}.slug`]: updatedData.slug,
         author: updatedData.author,
@@ -296,19 +309,49 @@ const handleGetRequest = async (req, res, blogs, query) => {
   }
 };
 
-
 const handleDeleteRequest = async (req, res, blogs, query) => {
   try {
     const id = query.id;
+    const language = query.language; // Assuming you pass the language in the query string
+
     if (!ObjectId.isValid(id)) {
       return res.status(400).json({ message: 'Invalid ID' });
     }
 
-    const result = await blogs.deleteOne({ _id: new ObjectId(id) });
-    if (result.deletedCount === 1) {
-      res.status(200).json({ message: 'Data deleted successfully' });
+    const blog = await blogs.findOne({ _id: new ObjectId(id) });
+
+    if (!blog) {
+      return res.status(404).json({ message: 'Blog post not found' });
+    }
+
+    // Check if the language exists in the translations
+    if (blog.translations && blog.translations[language]) {
+      delete blog.translations[language]; // Remove the specific language translation
+
+      // If no translations remain, delete the entire blog post
+      if (Object.keys(blog.translations).length === 0) {
+        const result = await blogs.deleteOne({ _id: new ObjectId(id) });
+
+        if (result.deletedCount === 1) {
+          res.status(200).json({ message: 'Blog post deleted successfully as no translations remain.' });
+        } else {
+          res.status(500).json({ message: 'Failed to delete blog post.' });
+        }
+      } else {
+        // Otherwise, update the blog post with the remaining translations
+        const result = await blogs.updateOne(
+          { _id: new ObjectId(id) },
+          { $set: { translations: blog.translations } }
+        );
+
+        if (result.modifiedCount === 1) {
+          res.status(200).json({ message: `Translation for language ${language} deleted.` });
+        } else {
+          res.status(500).json({ message: 'Failed to delete the translation.' });
+        }
+      }
     } else {
-      res.status(404).json({ message: 'Data not found' });
+      return res.status(404).json({ message: `Translation for language ${language} not found.` });
     }
   } catch (error) {
     console.error('DELETE error:', error);

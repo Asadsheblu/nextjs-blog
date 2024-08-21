@@ -38,6 +38,24 @@ function EditBlog() {
     }
   }, [id, language]);
 
+  useEffect(() => {
+    // Automatically generate a slug from the title
+    if (!isSlugEditable && title) {
+      setSlug(generateSlug(title));
+    }
+  }, [title, isSlugEditable]);
+
+  const generateSlug = (text) => {
+    return text
+      .toString()
+      .toLowerCase()
+      .replace(/\s+/g, '-') // Replace spaces with -
+      .replace(/[^\w-]+/g, '') // Remove all non-word characters
+      .replace(/--+/g, '-') // Replace multiple - with single -
+      .replace(/^-+/, '') // Trim - from start of text
+      .replace(/-+$/, ''); // Trim - from end of text
+  };
+
   const fetchCategories = async () => {
     try {
       const response = await fetch('/api/categories');
@@ -71,29 +89,24 @@ function EditBlog() {
         throw new Error('Failed to fetch blog data');
       }
       const data = await response.json();
+
       if (data.translations && data.translations[lang]) {
         const translation = data.translations[lang];
-        setQuillContent(translation.content);
-        setSelectedCategory(translation.category);
-        setTitle(translation.title);
-        setMetaTitle(translation.metaTitle);
-        setSlug(translation?.slug);
-        setMetaDescription(translation.metaDescription);
-        setDescription(translation.description);
-        setInitialImage(translation.image);
-        setSelectedAuthor(data.author); // Set the selected author
-        setSelectedEditor(data.editor); // Set the selected editor
-        setSelectedDeveloper(data.developer); // Set the selected developer
 
-        // Auto-select feature image logic
-        if (!translation.image) {
-          const firstImageMatch = translation.content.match(/<img[^>]+src="?([^"\s]+)"?\s*\/>/);
-          if (firstImageMatch && firstImageMatch[1]) {
-            setInitialImage(firstImageMatch[1]);
-          }
-        }
+        // Set the state with the fetched data
+        setQuillContent(translation.content || '');
+        setSelectedCategory(translation.category?._id || '');
+        setTitle(translation.title || '');
+        setMetaTitle(translation.metaTitle || '');
+        setSlug(translation.slug || '');
+        setMetaDescription(translation.metaDescription || '');
+        setDescription(translation.description || '');
+        setInitialImage(translation.image || '');
+        setSelectedAuthor(data.author || '');
+        setSelectedEditor(data.editor || '');
+        setSelectedDeveloper(data.developer || '');
       } else {
-        // Clear the form if the translation for the selected language does not exist
+        // Handle the case where translation for the selected language does not exist
         setQuillContent('');
         setSelectedCategory('');
         setTitle('');
@@ -101,11 +114,11 @@ function EditBlog() {
         setMetaTitle('');
         setMetaDescription('');
         setDescription('');
-        setSelectedAuthor(''); // Clear the selected author
-        setSelectedEditor(''); // Clear the selected editor
-        setSelectedDeveloper(''); // Clear the selected developer
+        setSelectedAuthor('');
+        setSelectedEditor('');
+        setSelectedDeveloper('');
       }
-      setIsDraft(data.isDraft);
+      setIsDraft(data.isDraft || false);
     } catch (error) {
       console.error('Error fetching blog data:', error.message);
       setError(error.message);
@@ -128,7 +141,7 @@ function EditBlog() {
       } else if (initialImage) {
         formData.append('image', initialImage);
       }
-      formData.append('category', selectedCategory);
+      formData.append('category', selectedCategory); // Save category ID
       formData.append('author', selectedAuthor); // Set selected author
       formData.append('editor', selectedEditor); // Set selected editor
       formData.append('developer', selectedDeveloper); // Set selected developer
@@ -176,6 +189,10 @@ function EditBlog() {
 
   const handleLanguageChange = (e) => {
     setLanguage(e.target.value);
+    setSelectedCategory(''); // Reset selected category when language changes
+    if (id) {
+      fetchBlogData(id, e.target.value); // Refetch blog data for the new language
+    }
   };
 
   const handleAuthorChange = (e) => {
@@ -200,6 +217,32 @@ function EditBlog() {
         <h2 className="text-3xl font-semibold mb-6">Edit Blog</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="mb-3">
+            <label htmlFor="language" className="block mb-2 text-lg font-medium">Language*</label>
+            <select
+              id="language"
+              value={language}
+              onChange={handleLanguageChange}
+              className="w-full border border-gray-300 rounded-lg p-3 shadow-sm"
+            >
+              <option value="en">English</option>
+              <option value="fr">French</option>
+              <option value="zh-HANT">中国传统的</option>
+              <option value="zh-HANS">简体中文</option>
+              <option value="nl">Nederlands</option>
+              <option value="gu">ગુજરાતી</option>
+              <option value="hi">हिंदी</option>
+              <option value="it">Italiano</option>
+              <option value="ja">日本語</option>
+              <option value="ko">한국어</option>
+              <option value="pl">Polski</option>
+              <option value="pt">Português</option>
+              <option value="ru">Русский</option>
+              <option value="es">Español</option>
+              <option value="de">Deutsch</option>
+              {/* Add more languages as needed */}
+            </select>
+          </div>
+          <div className="mb-3">
             <label htmlFor="metaTitle" className="block mb-2 text-lg font-medium">Meta Title</label>
             <input
               id="metaTitle"
@@ -213,14 +256,18 @@ function EditBlog() {
             <label htmlFor="category" className="block mb-2 text-lg font-medium">Categories*</label>
             <select
               id="category"
-              value={selectedCategory}
+              value={selectedCategory || ''}
               onChange={handleCategoryChange}
               className="w-full border border-gray-300 rounded-lg p-3 shadow-sm"
             >
               <option value="" disabled>Select a category</option>
-              {categories.map((category) => (
-                <option key={category._id} value={category.name}>{category.name}</option>
-              ))}
+              {categories
+                .filter((category) => category.translations && category.translations[language])
+                .map((category) => (
+                  <option key={category._id} value={category._id}>
+                    {category.translations[language].name || category.translations['en'].name}
+                  </option>
+                ))}
             </select>
           </div>
           <div className="mb-3">
@@ -253,32 +300,6 @@ function EditBlog() {
               onChange={(e) => setTitle(e.target.value)}
               className="w-full border border-gray-300 rounded-lg p-3 shadow-sm"
             />
-          </div>
-          <div className="mb-3">
-            <label htmlFor="language" className="block mb-2 text-lg font-medium">Language*</label>
-            <select
-              id="language"
-              value={language}
-              onChange={handleLanguageChange}
-              className="w-full border border-gray-300 rounded-lg p-3 shadow-sm"
-            >
-              <option value="en">English</option>
-              <option value="fr">French</option>
-              <option value="zh-HANT">中国传统的</option>
-              <option value="zh-HANS">简体中文</option>
-              <option value="nl">Nederlands</option>
-              <option value="gu">ગુજરાતી</option>
-              <option value="hi">हिंदी</option>
-              <option value="it">Italiano</option>
-              <option value="ja">日本語</option>
-              <option value="ko">한국어</option>
-              <option value="pl">Polski</option>
-              <option value="pt">Português</option>
-              <option value="ru">Русский</option>
-              <option value="es">Español</option>
-              <option value="de">Deutsch</option>
-              {/* Add more languages as needed */}
-            </select>
           </div>
           <div className="mb-3">
             <label htmlFor="slug" className="block mb-2 text-lg font-medium">Slug</label>
