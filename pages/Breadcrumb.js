@@ -1,6 +1,30 @@
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 
-const Breadcrumb = ({ blogTitle }) => {
+const Breadcrumb = ({ categoryName, blogTitle, translations }) => {
+
+  const router = useRouter();
+  const currentLanguage = router.locale || 'en';
+
+  // Function to convert category name to a slug
+  const generateSlug = (name) => {
+    if (!name) {
+      return 'unknown-category'; // Fallback slug if name is undefined or null
+    }
+    return name
+      .toLowerCase() // Convert to lowercase
+      .replace(/ /g, '-') // Replace spaces with hyphens
+      .replace(/[^\w-]+/g, ''); // Remove all non-word characters except hyphens
+  };
+
+  // Get the translated category name based on the current language
+  const translatedCategoryName = translations && translations[currentLanguage]?.name 
+    ? translations[currentLanguage].name 
+    : categoryName;
+
+  const categorySlug = generateSlug(translatedCategoryName);
+console.log(categorySlug);
+
   return (
     <nav aria-label="breadcrumb">
       <ol className="breadcrumb flex items-center text-sm md:text-base lg:text-lg">
@@ -10,30 +34,16 @@ const Breadcrumb = ({ blogTitle }) => {
           </Link>
         </li>
         <li className="breadcrumb-item">
-          <Link href="/blog">
-            <span className="text-blue-500 hover:underline whitespace-nowrap"> / Blog</span>
+          <Link href={`/categories/${categorySlug}`}>
+            <span className="text-blue-500 hover:underline whitespace-nowrap">{translatedCategoryName || 'Unknown Category'}</span>
           </Link>
         </li>
         {blogTitle && (
           <li className="breadcrumb-item active" aria-current="page">
-            <span className="text-gray-500 whitespace-nowrap"> / {blogTitle}</span>
+            <span className="text-gray-500 whitespace-nowrap">{blogTitle}</span>
           </li>
         )}
       </ol>
-      <style>{`
-        .breadcrumb {
-          list-style: none;
-          padding: 0;
-          white-space: nowrap; /* Ensure the breadcrumb items stay in one line */
-        }
-        .breadcrumb-item {
-          margin-right: 0.5rem;
-        }
-        .breadcrumb-item + .breadcrumb-item::before {
-          content: "";
-          margin-right: 0.5rem;
-        }
-      `}</style>
     </nav>
   );
 };

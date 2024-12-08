@@ -1,75 +1,183 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-
-const Comment = ({ comment, slug, onReply }) => {
-  const [showReplyForm, setShowReplyForm] = useState(false);
+const ReplyModal = ({ isOpen, onClose, onSubmit, parentId }) => {
   const [replyContent, setReplyContent] = useState('');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [captcha, setCaptcha] = useState('');
+  const [captchaInput, setCaptchaInput] = useState('');
+  const [captchaError, setCaptchaError] = useState('');
 
+  useEffect(() => {
+    if (isOpen) {
+      generateCaptcha();
+    }
+  }, [isOpen]);
 
-  const handleReplySubmit = async (e) => {
+  const generateCaptcha = () => {
+    const randomCaptcha = Math.random().toString(36).substring(2, 8);
+    setCaptcha(randomCaptcha);
+  };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
 
+    if (captchaInput !== captcha) {
+      setCaptchaError('Captcha does not match');
+      return;
+    }
+
+    onSubmit({ content: replyContent, name, email, parentId });
+    setReplyContent('');
+    setName('');
+    setEmail('');
+    setCaptchaInput('');
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-50">
+      <div className="relative w-full max-w-md p-6 mx-4 bg-white rounded-lg shadow-lg">
+        <h2 className="mb-4 text-xl font-bold">Reply to Comment</h2>
+        <form onSubmit={handleSubmit}>
+          <textarea
+            value={replyContent}
+            onChange={(e) => setReplyContent(e.target.value)}
+            placeholder="Write your reply..."
+            className="w-full p-2 mb-4 border border-gray-300 rounded-md"
+            rows="3"
+            required
+          />
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Your name"
+            className="w-full p-2 mb-4 border border-gray-300 rounded-md"
+            required
+          />
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Your email"
+            className="w-full p-2 mb-4 border border-gray-300 rounded-md"
+            required
+          />
+          <div className="mb-4">
+            <label htmlFor="captcha" className="block mb-2 font-bold text-gray-700">Captcha</label>
+            <div
+              className="mb-2 p-2 bg-gray-200 text-center text-xl font-bold rounded-md relative"
+              style={{
+                fontFamily: "'Courier New', Courier, monospace",
+                letterSpacing: '2px',
+                background: 'url("/path/to/your/background-image.png")', // Use a background image for added complexity
+                backgroundSize: 'cover',
+                position: 'relative',
+                display: 'inline-block',
+                transform: 'rotate(-5deg)', // Slight rotation for obfuscation
+                userSelect: 'none',
+              }}
+            >
+              <span
+                style={{
+                  color: 'transparent',
+                  textShadow: '0 0 10px rgba(0, 0, 0, 0.5)', // Add shadow for noise
+                  backgroundClip: 'text',
+                  webkitBackgroundClip: 'text',
+                }}
+              >
+                {captcha}
+              </span>
+            </div>
+            <input
+              type="text"
+              id="captcha"
+              value={captchaInput}
+              onChange={(e) => setCaptchaInput(e.target.value)}
+              placeholder="Enter captcha"
+              className="w-full p-2 mb-4 border border-gray-300 rounded-md"
+              required
+            />
+            {captchaError && <p className="text-red-500">{captchaError}</p>}
+          </div>
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 mr-2 text-white bg-gray-500 rounded"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 text-white bg-blue-500 rounded"
+            >
+              Submit Reply
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+const Comment = ({ comment, slug, onReply }) => {
+  const [isReplyModalOpen, setIsReplyModalOpen] = useState(false);
+
+  const handleReplySubmit = async ({ content, name, email, parentId }) => {
     try {
       const response = await axios.post(`/api/comments/${slug}`, {
-        content: replyContent,
-        parentId: comment._id,
+        content,
+        name,
+        email,
+        parentId,
       });
-      console.log(response);
-      
       onReply(response.data.comment);
-      setShowReplyForm(false);
-      setReplyContent('');
+      setIsReplyModalOpen(false);
       toast.info('Waiting for admin approval');
     } catch (error) {
       console.error('Error posting reply:', error);
+      toast.error('Failed to post reply.');
     }
   };
 
-
   return (
-    <div className={`mb-6 p-4 border border-gray-200 rounded-lg bg-white shadow-sm ${comment.approved ? '' : 'opacity-50'}`}>
-      <div className="flex items-start">
-        <div className="w-12 h-12 rounded-full bg-gray-200 flex-shrink-0 mr-4">
+    <div className={`mb-6 p-4 border border-gray-200 rounded-lg bg-white shadow-sm ${comment.approved ? '' : 'opacity-50'} max-w-full`}>
+      <div className="flex items-start space-x-3">
+        <div className="flex-shrink-0 w-10 h-10 bg-gray-200 rounded-full">
           {comment.authorProfile ? (
             <img src={comment.authorProfile} alt={comment.name} className="w-full h-full rounded-full object-cover" />
           ) : (
-            <div className="w-full h-full rounded-full bg-gray-300" />
+            <div className="w-full h-full bg-gray-300 rounded-full" />
           )}
         </div>
         <div className="flex-1">
-          <div className="flex items-center justify-between">
-            <p className="font-semibold text-gray-800">{comment.name}</p>
-            <p className="text-xs text-gray-500">{new Date(comment.createdAt).toLocaleString()}</p>
+          <div className="p-3 bg-gray-100 rounded-lg max-w-full">
+            <div className="flex items-center justify-between">
+              <p className="font-semibold text-gray-800 break-words">{comment.name}</p>
+              <p className="text-xs text-gray-500">{new Date(comment.createdAt).toLocaleString()}</p>
+            </div>
+            <p className="mb-2 text-gray-700 break-words comment-content">{comment.content}</p>
           </div>
-          <p className="text-gray-700 mb-4">{comment.content}</p>
           <button
-            onClick={() => setShowReplyForm(!showReplyForm)}
-            className="text-blue-500 hover:underline text-sm"
+            onClick={() => setIsReplyModalOpen(true)}
+            className="mt-2 text-sm text-blue-500 hover:underline"
           >
-            {showReplyForm ? 'Cancel' : 'Reply'}
+            Reply
           </button>
-          {showReplyForm && (
-            <form onSubmit={handleReplySubmit} className="mt-2">
-              <textarea
-                value={replyContent}
-                onChange={(e) => setReplyContent(e.target.value)}
-                placeholder="Write a reply..."
-                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
-                rows="2"
-              />
-              <button
-                type="submit"
-                className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none"
-              >
-                Post Reply
-              </button>
-            </form>
-          )}
+          <ReplyModal
+            isOpen={isReplyModalOpen}
+            onClose={() => setIsReplyModalOpen(false)}
+            onSubmit={handleReplySubmit}
+            parentId={comment._id}
+          />
           {comment.replies && comment.replies.length > 0 && (
-            <div className="mt-4 ml-4 sm:ml-8 border-l-2 border-gray-200 pl-4">
+            <div className="pl-8 mt-4">
               {comment.replies.map((reply) => (
                 <Comment key={reply._id} comment={reply} slug={slug} onReply={onReply} />
               ))}
@@ -110,7 +218,6 @@ const Comments = ({ slug }) => {
       setComments(response.data);
     } catch (error) {
       console.error('Error fetching comments:', error);
-      setError('Failed to load comments.');
     }
   };
 
@@ -167,72 +274,84 @@ const Comments = ({ slug }) => {
   };
 
   return (
-    <div className="mt-8 max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="w-full max-w-full pt-4 pb-4">
       <ToastContainer />
-      <h2 className="text-3xl font-bold mb-6">Comments</h2>
-      <form onSubmit={handleCommentSubmit} className="mb-6">
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Your name"
-          className="w-full p-4 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-          required
-        />
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Your email"
-          className="w-full p-4 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-          required
-        />
-        <textarea
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-          placeholder="Write a comment..."
-          className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-          rows="4"
-          required
-        />
-        <div className="mb-4">
-          <label htmlFor="captcha" className="block text-gray-700 font-bold mb-2">Captcha</label>
-          <div
-            className="captcha mb-2 bg-gray-200 p-2 rounded-md"
-            style={{
-              filter: 'blur(2px)',
-              fontFamily: "'Courier New', Courier, monospace",
-              fontSize: '24px',
-              fontWeight: 'bold',
-              letterSpacing: '2px',
-              textAlign: 'center',
-              background: 'linear-gradient(135deg, #f3f4f6 25%, #e5e7eb 25%, #e5e7eb 50%, #f3f4f6 50%, #f3f4f6 75%, #e5e7eb 75%, #e5e7eb)',
-              backgroundSize: '10px 10px'
-            }}
-          >
-            {captcha}
-          </div>
+      <div className='border bg-white shadow-sm p-5 mb-5'>
+        <h2 className="text-3xl font-bold mb-6">Leave Comments</h2>
+        <form onSubmit={handleCommentSubmit} className="mb-6">
           <input
             type="text"
-            id="captcha"
-            value={captchaInput}
-            onChange={(e) => setCaptchaInput(e.target.value)}
-            placeholder="Enter captcha"
-            className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Your name"
+            className="w-full md:w-1/2 p-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
             required
           />
-          {captchaError && <p className="text-red-500 mt-2">{captchaError}</p>}
-        </div>
-        <button
-          type="submit"
-          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none"
-          disabled={loading}
-        >
-          {loading ? 'Posting...' : 'Post Comment'}
-        </button>
-      </form>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Your email"
+            className="w-full md:w-1/2 me-2 p-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+            required
+          />
+          <textarea
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            placeholder="Write a comment..."
+            className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+            rows="4"
+            required
+          />
+          <div className="mb-4">
+            <label htmlFor="captcha" className="block text-gray-700 font-bold mb-2">Captcha</label>
+            <div
+              className="mb-2 p-2 bg-gray-200 text-center text-xl font-bold rounded-md relative"
+              style={{
+                fontFamily: "'Courier New', Courier, monospace",
+                letterSpacing: '2px',
+                background: 'url("/path/to/your/background-image.png")', // Use a background image for added complexity
+                backgroundSize: 'cover',
+                position: 'relative',
+                display: 'inline-block',
+                transform: 'rotate(-3deg)', // Slight rotation for obfuscation
+                userSelect: 'none',
+              }}
+            >
+              <span
+                style={{
+                  color: 'transparent',
+                  textShadow: '0 0 3px rgba(0, 0, 0, 0.3)', // Reduced blur effect
+                  backgroundClip: 'text',
+                  webkitBackgroundClip: 'text',
+                }}
+              >
+                {captcha}
+              </span>
+            </div>
+            <input
+              type="text"
+              id="captcha"
+              value={captchaInput}
+              onChange={(e) => setCaptchaInput(e.target.value)}
+              placeholder="Enter captcha"
+              className="w-full md:w-1/2 p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+              required
+            />
+            {captchaError && <p className="text-red-500">{captchaError}</p>}
+          </div>
+          <button
+            type="submit"
+            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none"
+            disabled={loading}
+          >
+            {loading ? 'Posting...' : 'Post Comment'}
+          </button>
+        </form>
+      </div>
+     
       {error && <p className="text-red-500 mb-4">{error}</p>}
-      <div>
+      <div className="w-full max-w-full">
         {comments.map((comment) => (
           <Comment key={comment._id} comment={comment} slug={slug} onReply={handleReply} />
         ))}

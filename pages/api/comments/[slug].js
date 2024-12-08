@@ -96,50 +96,65 @@ export default async function handler(req, res) {
     }
 
     case 'PUT': {
-      const { commentId, approved } = req.body;
-      console.log('Received commentId for approval:', commentId); // Log the received commentId
-      console.log('Received approval status:', approved); // Log the approval status
-      if (!commentId || typeof approved !== 'boolean') {
-        return res.status(400).json({ message: 'Invalid input' });
+      const { commentId, approved, content } = req.body;
+      console.log('Received commentId for update:', commentId); // Log the received commentId
+    
+      if (!commentId) {
+        return res.status(400).json({ message: 'Comment ID is required' });
       }
-
+    
+      const updateFields = {};
+    
+      if (typeof approved === 'boolean') {
+        updateFields.approved = approved;
+      }
+    
+      if (content) {
+        updateFields.content = content;
+      }
+    
+      if (Object.keys(updateFields).length === 0) {
+        return res.status(400).json({ message: 'No valid fields to update' });
+      }
+    
       try {
         const result = await comments.updateOne(
           { _id: new ObjectId(commentId) },
-          { $set: { approved } }
+          { $set: updateFields }
         );
-
+    
         console.log('Update result:', result);  // Log the result for debugging
-
+    
         if (result.modifiedCount === 0) {
           console.log(`Comment with ID ${commentId} not found or already updated`);
           return res.status(404).json({ message: 'Comment not found or already updated' });
         }
-
-        res.status(200).json({ message: 'Comment updated' });
+    
+        res.status(200).json({ message: 'Comment updated successfully' });
       } catch (error) {
         console.error('PUT error:', error);
         return res.status(500).json({ message: 'Internal server error', error: error.message });
       }
       break;
     }
-
+    
     case 'DELETE': {
       const { commentId } = req.body;
       console.log('Received commentId for deletion:', commentId); // Log the received commentId
-
+    
       if (!commentId) {
         return res.status(400).json({ message: 'Invalid input' });
       }
-
+    
       try {
         const result = await comments.deleteOne({ _id: new ObjectId(commentId) });
-
+        console.log(result);
+    
         if (result.deletedCount === 0) {
           console.log(`Comment with ID ${commentId} not found`);
           return res.status(404).json({ message: 'Comment not found' });
         }
-
+    
         res.status(200).json({ message: 'Comment deleted' });
       } catch (error) {
         console.error('DELETE error:', error);
@@ -147,6 +162,9 @@ export default async function handler(req, res) {
       }
       break;
     }
+    
+    
+    
 
     default:
       res.setHeader('Allow', ['GET', 'POST', 'PUT', 'DELETE']);
